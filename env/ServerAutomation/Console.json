@@ -1,0 +1,13 @@
+{
+  "bigfixApi" : {
+    "customSiteName": "Server Automation",
+
+    "consoleApi": {
+      "relevantVMForFixlet": "api/fixlet/external/{customSiteName}/{fixletID}/computers",
+      "initiateAction" : "api/actions",
+      "actionStatus": "api/action/{actionID}/status",
+      "stopAction":"api/action/{actionID}/stop",
+      "computerIDInfo": "api/computer/{computerID}"
+    }
+  }
+}
