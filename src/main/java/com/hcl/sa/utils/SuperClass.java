@@ -15,7 +15,7 @@ public class SuperClass {
     private JsonElement jsonElement = null;
     public static DataStore specStore = DataStoreFactory.getSpecDataStore();
 
-    //private Logger logger = LogManager.getLogger(com.hcl.bigfix.utils.SuperClass.class);
+    private Logger logger = LogManager.getLogger(com.hcl.sa.utils.SuperClass.class);
 
     private SuperClass() {
     }

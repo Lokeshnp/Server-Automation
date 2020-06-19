@@ -31,7 +31,7 @@
 
     </Appenders>
     <Loggers>
-        <Logger name ="com.hcl.bigfix" level="debug" additivity="false">
+        <Logger name ="com.hcl.sa" level="debug" additivity="false">
             <AppenderRef ref="RollingFile" />
             <AppenderRef ref ="htmlLogger" level = "trace"/>
             <AppenderRef ref="Console" level = "error"/>

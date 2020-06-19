@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 import static io.restassured.RestAssured.given;
 
-public class API_Requests {
+public class ApiRequests {
 
     public RequestSpecification setBaseURIAndBasicAuthentication() {
         RestAssured.baseURI = ConsoleConsts.BIGFIX_SERVER_URI.text;
@@ -75,5 +75,11 @@ public class API_Requests {
 
     public Response checkForStatusCode(Response res) {
         return res.then().assertThat().statusCode(200).extract().response();
+    }
+
+    public Response DELETE(String param, String paramValue, String uri) {
+        Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().contentType(ContentType.JSON).and().
+                pathParam(param, paramValue).and().when().delete(uri));
+        return response;
     }
 }

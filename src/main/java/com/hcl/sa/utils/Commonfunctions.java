@@ -2,13 +2,11 @@ package com.hcl.sa.utils;
 
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.XMLConsts;
-import com.hcl.sa.constants.ConsoleConsts;
 import io.restassured.response.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,29 +15,22 @@ import java.util.regex.Pattern;
 import org.xml.sax.SAXException;
 
 public class Commonfunctions  {
-    private Logger logger = LogManager.getLogger(ApiUtils.class);
+    private Logger logger = LogManager.getLogger(ConsoleActions.class);
     JsonParser jsonParser = new JsonParser();
     XMLParser xmlParser = new XMLParser();
-    String customSiteName = "Server Automation Development";
-    API_Requests apiRequests = new API_Requests();
-    JsonObject apiUriObject = jsonParser.getApiUriObject();
+    String customSiteName = jsonParser.getCustomSiteName();
+    ApiRequests apiRequests = new ApiRequests();
+    JsonObject apiUriObject = jsonParser.getConsoleApiObject();
 
     public String getLastModifiedDate(Response response) throws IOException, SAXException {
-       List<String> lastModifiedDate = xmlParser.getElementOfXML_UsingXPath(response.asInputStream(), XMLConsts.ACTION_LASTMODIFIED_XPATH.text);
-       List<String> modifiedDate = new ArrayList<String>();
-       for(String lastDate:lastModifiedDate){
-           modifiedDate.add(lastDate);
-       }
-       String lastFilteredDate = null;
-       if (modifiedDate != null && !modifiedDate.isEmpty()) {
-            lastFilteredDate = modifiedDate.get(modifiedDate.size()-1);
-       }
-       logger.debug("Action ID " + modifiedDate);
+       List<String> lastModifiedDate = xmlParser.getElementOfXmlByXpath(response.asInputStream(), XMLConsts.ACTION_LASTMODIFIED_XPATH.text);
+       String lastFilteredDate = lastModifiedDate.get(lastModifiedDate.size()-1);
+       logger.debug("lastFilteredDate " + lastFilteredDate);
        return lastFilteredDate;
     }
 
     public String getActionIDForFixlet(Response response, String lastModifiedDate)throws IOException, SAXException {
-        String actionId =  xmlParser.getElementOfXML_UsingXPath(response.asInputStream(), "//Name[starts-with(text(), 'Install Latest Automation Plan Engine')]/parent::Action[@LastModified='"+lastModifiedDate+"']/ID/text()").get(0);
+        String actionId =  xmlParser.getElementOfXmlByXpath(response.asInputStream(), "//Name[starts-with(text(), 'Install Latest Automation Plan Engine')]/parent::Action[@LastModified='"+lastModifiedDate+"']/ID/text()").get(0);
         logger.debug("Action ID " + actionId);
         return actionId;
     }
@@ -48,9 +39,9 @@ public class Commonfunctions  {
        Response response = initiateAction(fixletID, computerID);
        String lastModifiedDate = getLastModifiedDate(response);
        String actionId = getActionIDForFixlet(response, lastModifiedDate);
-       String actionStatus = getActionStatusAndVerify(actionId);
-       logger.debug("Response after initiating the action: \n" + actionStatus);
-       return actionStatus;
+       //String actionStatus = getActionStatusAndVerify(actionId);
+       logger.debug("Response after initiating the action: \n" + actionId);
+       return actionId;
     }
 
     public Response initiateAction(String fixletID, String computerID) {
@@ -75,21 +66,6 @@ public class Commonfunctions  {
         return response;
     }
 
-    public Response getActionStatus(String actionID) {
-        String uri = jsonParser.getUriToFetchActionStatus(apiUriObject);
-        Response response = apiRequests.GET(ConsoleConsts.ACTION_ID.text, actionID, uri);
-        return response;
-    }
-
-    public String getActionStatusAndVerify(String actionID) throws IOException, SAXException {
-        String getStatus;
-        Response response = getActionStatus(actionID);
-        getStatus = xmlParser.getElementOfXML_UsingXPath(response.asInputStream(), XMLConsts.COMPUTER_STATUS_XPATH.text).get(0);
-        logger.debug("Action Status = " + getStatus);
-        return getStatus;
-    }
-
-    //generic method for cve Filter
     public String filterData(String regEx, String source) {
         logger.debug("RegEx: " + regEx + " to filter data from the \n source: " + source);
         Set<String> data = new HashSet<>();
@@ -101,16 +77,14 @@ public class Commonfunctions  {
         return filteredData;
     }
 
-    //Generic method for regEx filter
     public Matcher getRegExMatcher(String regEx, String source) {
         Pattern pattern = Pattern.compile(regEx);
         Matcher matcher = pattern.matcher(source);
         return matcher;
     }
 
-    public String filterDataForTargetVm(String bigfixIpAddress) {
+    public String getIpAddress(String bigfixIpAddress) {
         String ipAddress = bigfixIpAddress.split("/")[2].split(":")[0];
         return ipAddress;
     }
 }
-

@@ -1,5 +1,5 @@
 package com.hcl.sa.constants;
 
-public enum CreatePlan {
+public enum CreatePlanConsts {
 
 }
