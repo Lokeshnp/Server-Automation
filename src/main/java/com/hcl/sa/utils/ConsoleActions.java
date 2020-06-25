@@ -2,8 +2,10 @@ package com.hcl.sa.utils;
 
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
+import com.hcl.sa.constants.TimeOutConsts;
 import com.hcl.sa.constants.XMLConsts;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -19,28 +21,26 @@ import java.util.List;
 public class ConsoleActions {
     private Logger logger = LogManager.getLogger(ConsoleActions.class);
     ApiRequests apiRequests = new ApiRequests();
-    Commonfunctions commonFunctions = new Commonfunctions();
+    CommonFunctions commonFunctions = new CommonFunctions();
     XMLParser xmlParser = new XMLParser();
     JsonParser jsonParser = new JsonParser();
 
-    String customSiteName = jsonParser.getCustomSiteName();
+    String customSiteName = jsonParser.getSiteNameObject().get(ConsoleConsts.SERVER_AUTOMATION.text).getAsString();
 
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
 
-    public Response getRelevantComputers(String fixletID) {
+    public Response getRelevantComputers(HashMap<String, String> params) {
         String uri = jsonParser.getUriToFetchRelevantComputers(consoleApiObject);
-        HashMap<String, String> params = new HashMap<>();
-        params.put(ConsoleConsts.PARAM_NAME_CUSTOM_SITE.text, customSiteName);
-        params.put(ConsoleConsts.FIXLET_ID.text, fixletID);
-        Response response = apiRequests.GET(params, uri);
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().and().pathParams(params);
+        Response response = apiRequests.GET(requestSpecification, uri);
         return response;
     }
 
     public List<String> getApplicableComputersID(String fixletID) throws IOException, SAXException {
         List<String> compIDsList = new ArrayList<String>();
-        Response response = getRelevantComputers(fixletID);
+        Response response = getRelevantComputers(commonFunctions.commonParams(fixletID));
         logger.debug("Relevant Machines = " + response.asString());
-        List<String> computersList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), XMLConsts.COMPUTER_ATTRIBUTE_XPATH.text);
+        List<String> computersList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), XMLConsts.COMP_ATTR_XPATH.text);
         computersList.forEach(computer -> {
             String computerID = commonFunctions.filterData(ConsoleConsts.COMPUTER_ID_REGEX.text, computer);
             compIDsList.add(computerID.split("/")[1]);
@@ -49,20 +49,20 @@ public class ConsoleActions {
         return compIDsList;
     }
 
-    public Integer waitUntilApplicableCompsVisible(String fixletID, int timeout) throws IOException, SAXException, ParserConfigurationException {
+    public Integer waitUntilApplicableCompsVisible(String fixletID) throws IOException, SAXException, ParserConfigurationException {
         int computerTagCount;
         long startTime = System.currentTimeMillis();
-        boolean isPending = true;
-            do {
-                Response relevantMachines = getRelevantComputers(fixletID);
-                computerTagCount = xmlParser.getElementsByTagName(relevantMachines.asInputStream(), XMLConsts.COMPUTER_TAGNAME.text).getLength();
-                isPending =(System.currentTimeMillis()-startTime)<timeout ;
-                if (isPending == false) {
-                    logger.info("Applicable computers are zero for this fixlet ");
-                    break;
-                }
-            } while (computerTagCount == 0);
-            return computerTagCount;
+        boolean waitUntillApplicableCompsDisp = true;
+        do {
+            Response relevantMachines = getRelevantComputers(commonFunctions.commonParams(fixletID));
+            computerTagCount = xmlParser.getElementsByTagName(relevantMachines.asInputStream(), XMLConsts.COMPUTER_TAGNAME.text).getLength();
+            waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertMilliSecToSec(TimeOutConsts.TIME_OUT.text);
+            if (waitUntillApplicableCompsDisp == false) {
+                logger.info("Applicable computers are zero for this fixlet ");
+                break;
+            }
+        } while (computerTagCount == 0);
+        return computerTagCount;
     }
 
     public String getApplicableComputerID(String fixletID, String targetVmIpAddress) throws IOException, SAXException {
@@ -116,24 +116,20 @@ public class ConsoleActions {
     }
 
     //TODO : move to particular class
-    public void uninstallAutomationPlanEngine(String fixletID, String targetVmIpAddress) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
-        String actionID = takeAction(fixletID, targetVmIpAddress);
-        String actionStatus  = SuperClass.specStore.get(ConsoleConsts.ACTION_STATUS).toString();
-        verifyActionStatus(fixletID, actionID, actionStatus, targetVmIpAddress);
+    public void uninstallAutomationPlanEngine(String fixletID) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
+        takeAction(fixletID);
     }
 
     //TODO : move to particular class
-    public void installAutomationPlanEngine(String fixletID, String targetVmIpAddress) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
-        String actionID = takeAction(fixletID, targetVmIpAddress);
-        String actionStatus  = SuperClass.specStore.get(ConsoleConsts.ACTION_STATUS).toString();
-        verifyActionStatus(fixletID, actionID, actionStatus, targetVmIpAddress);
+    public void installAutomationPlanEngine(String fixletID) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
+        takeAction(fixletID);
     }
 
-    public String takeAction(String fixletID, String targetVmIpAddress) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
+    public void takeAction(String fixletID) throws IOException, SAXException, ParserConfigurationException {
         Response response = null;
-        targetVmIpAddress = commonFunctions.getIpAddress(targetVmIpAddress);
+        String targetVmIpAddress = commonFunctions.getIpAddress(ConsoleConsts.BIGFIX_SERVER_URI.text);
         String computerID = getApplicableComputerID(fixletID, targetVmIpAddress);
-        Integer computerTagCount = waitUntilApplicableCompsVisible(fixletID, 10000);
+        Integer computerTagCount = waitUntilApplicableCompsVisible(fixletID);
         String actionID = null;
         if (computerTagCount == 1) {
             response = initiateAction(fixletID, computerID);
@@ -141,8 +137,8 @@ public class ConsoleActions {
             waitTillXmlResponseReceived(actionID);
             String actionStatus = waitTillActionIsFixed(actionID);
             SuperClass.specStore.put(ConsoleConsts.ACTION_STATUS, actionStatus);
+            verifyActionStatus(fixletID, actionID, actionStatus, targetVmIpAddress);
         }
-        return actionID;
     }
 
     public Response getActionStatus(String actionID) {

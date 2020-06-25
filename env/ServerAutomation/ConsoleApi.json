@@ -1,14 +1,18 @@
 {
-  "bigfixApi" : {
-    "customSiteName": "Server Automation",
-
+  "bigfixApi": {
     "consoleApi": {
-      "relevantComputers": "api/fixlet/external/{customSiteName}/{fixletID}/computers",
-      "initiateAction" : "api/actions",
+      "relevantComputers": "api/fixlet/{siteType}/{siteName}/{fixletID}/computers",
+      "initiateAction": "api/actions",
       "actionStatus": "api/action/{actionID}/status",
-      "stopAction":"api/action/{actionID}/stop",
+      "stopAction": "api/action/{actionID}/stop",
       "compProperties": "api/computer/{computerID}",
       "deleteAction": "/api/action/{actionID}"
+    },
+    "siteType": {
+      "external": "external"
+    },
+    "siteName": {
+      "serverAutomation": "Server Automation"
     }
   }
 }

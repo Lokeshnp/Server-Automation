@@ -4,10 +4,6 @@ This Task installs or upgrades the Automation Plan Engine and (re)starts it auto
 verify plan engine installation
 -------------------------------
 Tags: config
-* Uninstall automation plan engine
 * Plan engine should be up and running
+* Uninstall automation plan engine
 * Delete plan action
-
-
-
-

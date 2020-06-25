@@ -7,8 +7,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-import java.util.HashMap;
-
 import static io.restassured.RestAssured.given;
 
 public class ApiRequests {
@@ -28,26 +26,6 @@ public class ApiRequests {
 
     public Response GET(String parameter, String parameterValue, String uri) {
         Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().and().pathParam(parameter, parameterValue).and().when().get(uri));
-        return response;
-    }
-
-    public Response GETRequest(String parameter, String parameterValue, String uri) {
-        Response response = setBaseURIAndBasicAuthentication().and().pathParam(parameter, parameterValue).and().when().get(uri).then().extract().response();
-        return response;
-    }
-
-    public Response GET(HashMap<String, String> params, String uri) {
-        String paramCustomSite = ConsoleConsts.PARAM_NAME_CUSTOM_SITE.text;
-        String fixletID = ConsoleConsts.FIXLET_ID.text;
-        Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().and().
-                pathParam(paramCustomSite, params.get(paramCustomSite)).and().
-                pathParam(fixletID, params.get(fixletID))
-                .and().when().get(uri));
-        return response;
-    }
-
-    public Response DELETE(String uri) {
-        Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().delete(uri));
         return response;
     }
 
@@ -80,6 +58,11 @@ public class ApiRequests {
     public Response DELETE(String param, String paramValue, String uri) {
         Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().contentType(ContentType.JSON).and().
                 pathParam(param, paramValue).and().when().delete(uri));
+        return response;
+    }
+
+    public Response GET(RequestSpecification reqSpecs, String uri) {
+        Response response = checkForStatusCode(reqSpecs.when().get(uri));
         return response;
     }
 }

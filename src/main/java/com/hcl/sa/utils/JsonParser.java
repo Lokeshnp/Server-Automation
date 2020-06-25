@@ -7,12 +7,8 @@ import com.hcl.sa.constants.ConsoleConsts;
 public class JsonParser {
     JsonElement consoleObj = SuperClass.getInstance().getJsonParser(ConsoleConsts.CONSOLE_API_JSON_PATH.text).getAsJsonObject().get(ConsoleConsts.CONSOLE.text);
 
-    public String getCustomSiteName() {
-        return consoleObj.getAsJsonObject().get(ConsoleConsts.CUSTOM_SITE_NAME.text).getAsString();
-    }
-
     public JsonObject getConsoleApiObject() {
-        return consoleObj.getAsJsonObject().get(ConsoleConsts.API_URI.text).getAsJsonObject();
+        return consoleObj.getAsJsonObject().get(ConsoleConsts.CONSOLE_API.text).getAsJsonObject();
     }
 
     public String getUriToDeleteAction(JsonObject jsonObject) {
@@ -39,7 +35,11 @@ public class JsonParser {
         return jsonObject.get(ConsoleConsts.STOP_ACTION.text).getAsString();
     }
 
-    public String getSiteName(JsonObject jsonObject) {
-        return jsonObject.get(ConsoleConsts.SITE_NAME.text).getAsString();
+    public JsonObject getSiteTypeObject() {
+        return consoleObj.getAsJsonObject().get(ConsoleConsts.SITE_TYPE.text).getAsJsonObject();
+    }
+
+    public JsonObject getSiteNameObject() {
+        return consoleObj.getAsJsonObject().get(ConsoleConsts.SITE_NAME.text).getAsJsonObject();
     }
 }
