@@ -42,8 +42,8 @@ public class CommonFunctions {
         return ipAddress;
     }
 
-    public long convertMilliSecToSec(String time) {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(TimeOutConsts.TIME_OUT.text));
+    public long convertToSeconds(String milliSeconds) {
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(TimeOutConsts.WAIT_10_SEC.text));
         return seconds;
     }
 
