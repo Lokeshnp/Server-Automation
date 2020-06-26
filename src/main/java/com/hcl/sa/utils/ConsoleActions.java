@@ -25,7 +25,7 @@ public class ConsoleActions {
     XMLParser xmlParser = new XMLParser();
     JsonParser jsonParser = new JsonParser();
 
-    String customSiteName = jsonParser.getSiteNameObject().get(ConsoleConsts.SERVER_AUTOMATION.text).getAsString();
+    String siteName = jsonParser.getSiteNameObject().get(ConsoleConsts.SERVER_AUTOMATION.text).getAsString();
 
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
 
