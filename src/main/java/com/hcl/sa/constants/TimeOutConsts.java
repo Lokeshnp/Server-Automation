@@ -2,7 +2,8 @@ package com.hcl.sa.constants;
 
 public enum TimeOutConsts {
 
-    TIME_OUT("10000");
+    //TODO WE NEED TO ADD SECONDS INSTEAD OF MILLI SECONDS
+    WAIT_10_SECONDS("10000");
 
     public String text;
 
