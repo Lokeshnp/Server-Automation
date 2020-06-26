@@ -43,7 +43,7 @@ public class CommonFunctions {
     }
 
     public long convertToSeconds(String milliSeconds) {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(TimeOutConsts.WAIT_10_SEC.text));
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(TimeOutConsts.WAIT_10_SECONDS.text));
         return seconds;
     }
 
