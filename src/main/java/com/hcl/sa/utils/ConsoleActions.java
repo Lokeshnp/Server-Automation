@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.TimeOutConsts;
 import com.hcl.sa.constants.XMLConsts;
+import com.hcl.sa.objectRepository.XmlLocators;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class ConsoleActions {
+public class ConsoleActions implements XmlLocators {
     private Logger logger = LogManager.getLogger(ConsoleActions.class);
     ApiRequests apiRequests = new ApiRequests();
     CommonFunctions commonFunctions = new CommonFunctions();
@@ -40,7 +41,7 @@ public class ConsoleActions {
         List<String> compIDsList = new ArrayList<String>();
         Response response = getRelevantComputers(commonFunctions.commonParams(fixletID));
         logger.debug("Relevant Machines = " + response.asString());
-        List<String> computersList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), XMLConsts.COMP_ATTR_XPATH.text);
+        List<String> computersList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), COMP_ATTR_XPATH);
         computersList.forEach(computer -> {
             String computerID = commonFunctions.filterData(ConsoleConsts.COMPUTER_ID_REGEX.text, computer);
             compIDsList.add(computerID.split("/")[1]);
@@ -56,8 +57,8 @@ public class ConsoleActions {
         do {
             Response relevantMachines = getRelevantComputers(commonFunctions.commonParams(fixletID));
             computerTagCount = xmlParser.getElementsByTagName(relevantMachines.asInputStream(), XMLConsts.COMPUTER_TAGNAME.text).getLength();
-            waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertMilliSecToSec(TimeOutConsts.TIME_OUT.text);
-            if (waitUntillApplicableCompsDisp == false) {
+            waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
+            if (!waitUntillApplicableCompsDisp) {
                 logger.info("Applicable computers are zero for this fixlet ");
                 break;
             }
@@ -73,7 +74,7 @@ public class ConsoleActions {
         for (int i = 0; i < computerIDsSize; i++) {
             String uri = jsonParser.getUriToFetchCompProperties(consoleApiObject);
             Response response = apiRequests.GET(ConsoleConsts.COMPUTER_ID.text, computerIDs.get(i), uri);
-            ipAddress = xmlParser.getElementOfXmlByXpath(response.asInputStream(), XMLConsts.IP_ADDRESS_XPATH.text).get(0);
+            ipAddress = xmlParser.getElementOfXmlByXpath(response.asInputStream(), IP_ADDRESS_XPATH).get(0);
 
             if (ipAddress.equals(targetVmIpAddress)) {
                 computerID = computerIDs.get(i);
@@ -94,7 +95,7 @@ public class ConsoleActions {
                 "<BES xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"BES.xsd\">\r\n" +
                 " <SourcedFixletAction>\r\n" +
                 "   <SourceFixlet>\r\n" +
-                "     <Sitename>" + customSiteName + "</Sitename>\r\n" +
+                "     <Sitename>" + siteName + "</Sitename>\r\n" +
                 "     <FixletID>" + fixletID + "</FixletID>\r\n" +
                 "     <Action>Action1</Action>\r\n" +
                 "   </SourceFixlet>\r\n" +
@@ -110,19 +111,9 @@ public class ConsoleActions {
     }
 
     public String getActionID(InputStream inputStream) throws IOException, SAXException {
-        String actionID = xmlParser.getElementOfXmlByXpath(inputStream, XMLConsts.ACTION_ID_XPATH.text).get(0);
+        String actionID = xmlParser.getElementOfXmlByXpath(inputStream, ACTION_ID_XPATH).get(0);
         logger.debug("Action ID " + actionID);
         return actionID;
-    }
-
-    //TODO : move to particular class
-    public void uninstallAutomationPlanEngine(String fixletID) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
-        takeAction(fixletID);
-    }
-
-    //TODO : move to particular class
-    public void installAutomationPlanEngine(String fixletID) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
-        takeAction(fixletID);
     }
 
     public void takeAction(String fixletID) throws IOException, SAXException, ParserConfigurationException {
@@ -171,7 +162,7 @@ public class ConsoleActions {
         logger.info("Waiting till the fixlet status becomes fixed or failed or restart");
         do {
             Response response = getActionStatus(actionID);
-            status = xmlParser.getElementOfXmlByXpath(response.asInputStream(), XMLConsts.COMPUTER_STATUS_XPATH.text).get(0);
+            status = xmlParser.getElementOfXmlByXpath(response.asInputStream(), COMPUTER_STATUS_XPATH).get(0);
             isSuccessful = (status.toString().contains("successful"));
             isRestart = (status.toString().contains("restart"));
             isFailed = (status.toString().contains("failed"));

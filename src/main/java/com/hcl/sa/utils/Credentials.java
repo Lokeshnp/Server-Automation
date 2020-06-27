@@ -1,7 +1,6 @@
-package com.hcl.sa.constants;
+package com.hcl.sa.utils;
 
 public enum Credentials {
-
     CONSOLE{
         @Override
         public String getPassword() {
@@ -12,8 +11,13 @@ public enum Credentials {
         public String getUsername() {
             return  System.getenv("console_username");
         }
-    };
 
+        @Override
+        public String getServerIP() {
+            return  System.getenv("bigfix_server_ip");
+        }
+    };
     public abstract  String getPassword();
     public abstract  String getUsername();
+    public abstract String getServerIP();
 }

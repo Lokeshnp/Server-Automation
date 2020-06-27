@@ -1,7 +1,6 @@
 package com.hcl.sa.utils;
 
 import com.hcl.sa.constants.ConsoleConsts;
-import com.hcl.sa.constants.Credentials;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;

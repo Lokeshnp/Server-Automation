@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
 
 public class JsonParser {
-    JsonElement consoleObj = SuperClass.getInstance().getJsonParser(ConsoleConsts.CONSOLE_API_JSON_PATH.text).getAsJsonObject().get(ConsoleConsts.CONSOLE.text);
+    JsonElement consoleObj = SuperClass.getInstance().getJsonParser(ConsoleConsts.BIGFIX_API_JSON_PATH.text).getAsJsonObject().get(ConsoleConsts.BIGFIX_API.text);
 
     public JsonObject getConsoleApiObject() {
         return consoleObj.getAsJsonObject().get(ConsoleConsts.CONSOLE_API.text).getAsJsonObject();

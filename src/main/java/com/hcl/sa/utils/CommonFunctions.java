@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,9 +43,9 @@ public class CommonFunctions {
         return ipAddress;
     }
 
-    public long convertToSeconds(String milliSeconds) {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(TimeOutConsts.WAIT_10_SECONDS.text));
-        return seconds;
+    public long convertToMilliSeconds(long seconds) {
+        long milliSeconds = TimeUnit.SECONDS.toMillis(seconds);
+        return milliSeconds;
     }
 
     public HashMap<String, String> commonParams(String fixletID) {
@@ -54,4 +55,6 @@ public class CommonFunctions {
         commonPara.put(ConsoleConsts.FIXLET_ID.text, fixletID);
         return commonPara;
     }
+
+
 }
