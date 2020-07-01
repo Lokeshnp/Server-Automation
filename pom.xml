@@ -65,6 +65,17 @@
             <artifactId>java-client</artifactId>
             <version>7.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!-- mvn install:install-file -Dfile={jar file path} -DgroupId=com.hcl.bigfix -DartifactId=vsphere-samples -Dversion=6.7.1 -Dpackaging=jar -->
+        <dependency>
+            <groupId>com.hcl.bigfix</groupId>
+            <artifactId>vsphere-samples</artifactId>
+            <version>6.7.1</version>
+        </dependency>
     </dependencies>
 
     <build>

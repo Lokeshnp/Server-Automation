@@ -5,29 +5,39 @@ import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.TimeOutConsts;
 import com.hcl.sa.constants.XMLConsts;
 import com.hcl.sa.objectRepository.XmlLocators;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ConsoleActions implements XmlLocators {
-    private Logger logger = LogManager.getLogger(ConsoleActions.class);
+    private final Logger logger = LogManager.getLogger(ConsoleActions.class);
     ApiRequests apiRequests = new ApiRequests();
     CommonFunctions commonFunctions = new CommonFunctions();
     XMLParser xmlParser = new XMLParser();
     JsonParser jsonParser = new JsonParser();
-
+    Payload payload = new Payload();
     String siteName = jsonParser.getSiteNameObject().get(ConsoleConsts.SERVER_AUTOMATION.text).getAsString();
-
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
 
     public Response getRelevantComputers(HashMap<String, String> params) {
@@ -189,4 +199,42 @@ public class ConsoleActions implements XmlLocators {
         Response response = apiRequests.DELETE(ConsoleConsts.ACTION_ID.text, actionID, uri);
         logger.debug("Response after deleting the action = " + response.asString());
     }
+
+    public HashMap<String,String> importFixlet(String folderPath,RequestSpecification requestSpecification) throws IOException, SAXException {
+        HashMap<String,String> fixletID = new HashMap<>();
+        File[] files = new File(folderPath).listFiles();
+        for (File file : files) {
+            if (file.isFile()) {
+                String fileName = file.getName();
+                String apiRequestBody = commonFunctions.readTextFile(folderPath + fileName).toString();
+                String uri = jsonParser.getUriToImportFixlet(jsonParser.getConsoleApiObject());
+                Response response = apiRequests.POST(requestSpecification, uri,apiRequestBody);
+                logger.debug("API request Response after importing the fixlet into custom site =/n" + response.asString());
+                logger.info("Fixlet got imported to the site " + siteName);
+                fixletID.put(fileName,xmlParser.getElementOfXmlByXpath(response.asInputStream(),XmlLocators.FIXLET_ID_XPATH).get(0));
+            }
+        }
+        logger.debug("Imported Fixlet details="+fixletID);
+        SuperClass.specStore.put(ConsoleConsts.FIXLET_ID_LIST,fixletID);
+        return fixletID;
+    }
+
+
+    public String createBaseline(String siteType,String siteName) throws IOException, SAXException, TransformerException {
+        String baselineFolderPath = CommonFunctions.getPath(ConsoleConsts.BASELINE_FIXLETS_FOLDER.text);
+        String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
+        String sourceSiteName = ConsoleConsts.CUSTOM_SITE.text+"_"+siteName;
+        logger.debug("Baseline Folder path="+baselineFolderPath);
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
+        contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+        pathParams(commonFunctions.commonParams(siteType,siteName));
+        importFixlet(CommonFunctions.getPath(baselineFolderPath),requestSpecification);
+        String body = payload.createBaseline(new FileInputStream(baselinePayloadPath),sourceSiteName);
+        logger.debug("API  Request body for sending API="+body);
+        String uri  = jsonParser.getUriToCreateBaseline(jsonParser.getConsoleApiObject());
+        Response response = apiRequests.POST(requestSpecification, uri,body);
+        logger.debug("Create baseline API response="+response.asString());
+        return xmlParser.getElementOfXmlByXpath(response.asInputStream(),XmlLocators.BASELINE_ID_XPATH).get(0);
+    }
+
 }

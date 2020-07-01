@@ -8,6 +8,8 @@ public interface XmlLocators {
     String COMPUTER_STATUS_XPATH = "//Computer/Status/text()";
     String ACTION_LASTMODIFIED_XPATH = "(//Name[starts-with(text(), 'Install Latest Automation Plan Engine')]/parent::Action[last()]/@LastModified)";
     String ACTION_STATUS_XPATH = "//Name[starts-with(text(), 'Install Latest Automation Plan Engine')]/parent::Action[@LastModified='date']/ID/text()";
+    String FIXLET_ID_XPATH = "//Fixlet/ID/text()";
+    String BASELINE_ID_XPATH = "//ID/text()";
 
 
 }

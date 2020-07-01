@@ -2,14 +2,17 @@ package com.hcl.sa.utils;
 
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.TimeOutConsts;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +57,44 @@ public class CommonFunctions {
         commonPara.put(ConsoleConsts.SITE_NAME.text, jsonParser.getSiteNameObject().get(ConsoleConsts.SERVER_AUTOMATION.text).getAsString());
         commonPara.put(ConsoleConsts.FIXLET_ID.text, fixletID);
         return commonPara;
+    }
+
+    public HashMap<String, String> commonParams(String siteType,String siteName) {
+        HashMap<String, String> commonPara = new HashMap<>();
+        commonPara.put(ConsoleConsts.SITE_TYPE.text, jsonParser.getSiteTypeObject().get(siteType).getAsString());
+        commonPara.put(ConsoleConsts.SITE_NAME.text, jsonParser.getSiteNameObject().get(siteName).getAsString());
+        logger.debug("Common Params="+commonPara);
+        return commonPara;
+    }
+
+    public StringBuilder readTextFile(String textFilepath) throws IOException {
+        File file = new File(textFilepath);
+        logger.debug("Text File Path = " + textFilepath);
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        StringBuilder stringBuilder = new StringBuilder();
+        String textData = bufferedReader.readLine();
+        while (textData != null) {
+            stringBuilder.append(textData).append("\n");
+            textData = bufferedReader.readLine();
+        }
+        return stringBuilder;
+    }
+
+    public static String getPath(String staticPath) {
+        return staticPath.replace("{user.dir}", System.getProperty("user.dir"));
+
+    }
+
+    public List<String> getAllFileNames(String folderPath){
+        List<String> fileNames = new ArrayList<>();
+        File directory = new File(folderPath);
+        File[] files = directory.listFiles();
+        for(File file:files){
+            if(file.isFile()){
+                fileNames.add(file.getName());
+            }
+        }
+        return fileNames;
     }
 
 

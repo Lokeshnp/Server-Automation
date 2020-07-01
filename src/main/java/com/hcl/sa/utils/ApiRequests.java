@@ -50,6 +50,16 @@ public class ApiRequests {
         return response;
     }
 
+    public Response POST(RequestSpecification reqSpecs, String uri) {
+        Response response = checkForStatusCode(reqSpecs.when().post(uri));
+        return response;
+    }
+
+    public Response POST(RequestSpecification reqSpecs, String uri,String body) {
+        Response response = checkForStatusCode(reqSpecs.and().body(body).when().post(uri));
+        return response;
+    }
+
     public Response checkForStatusCode(Response res) {
         return res.then().assertThat().statusCode(200).extract().response();
     }

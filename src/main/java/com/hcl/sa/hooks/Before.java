@@ -19,6 +19,7 @@ public class Before {
     @BeforeSuite()
     public void configBeforeSuite() throws ParserConfigurationException, SAXException, IOException {
         logger.info("Checking if plan engine is up and running");
-        consoleActions.takeAction(ConsoleConsts.INSTALL_PE_FIXLET_ID.text);
+        //TODO NEED TO FIND SOME WAY TO SKIP THIS METHOD OR REDUCE TIME WHEN NOT REQUIRED
+//        consoleActions.takeAction(ConsoleConsts.INSTALL_PE_FIXLET_ID.text);
     }
 }

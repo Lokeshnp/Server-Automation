@@ -6,13 +6,17 @@
       "actionStatus": "api/action/{actionID}/status",
       "stopAction": "api/action/{actionID}/stop",
       "compProperties": "api/computer/{computerID}",
-      "deleteAction": "/api/action/{actionID}"
+      "deleteAction": "/api/action/{actionID}",
+      "importFixlet": "api/import/{siteType}/{siteName}",
+      "createBaselines":"api/baselines/{siteType}/{siteName}"
     },
     "siteType": {
-      "external": "external"
+      "external": "external",
+      "custom": "custom"
     },
     "siteName": {
-      "serverAutomation": "Server Automation"
+      "serverAutomation": "Server Automation",
+      "Abhinav":"Abhinav"
     }
   }
 }

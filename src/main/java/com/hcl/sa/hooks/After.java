@@ -6,7 +6,7 @@ import com.thoughtworks.gauge.AfterSpec;
 
 public class After {
     @AfterSpec
-    public void cofigAfterSpec(){
+    public void configAfterSpec(){
         SuperClass.getInstance().getWinAppDriver(ConsoleConsts.CONSOLE_EXE_PATH.text).quit();
     }
 }

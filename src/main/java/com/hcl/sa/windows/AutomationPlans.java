@@ -41,9 +41,9 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.info("Add step button clicked");
     }
 
-    public void addStepToPlan(String filter){
-        searchUsingName(filter);
-        List<WebElement> result = winActions.findElementsByXpath("//Table//DataItem[contains(@Name,'"+filter+"')]");
+    public void addStepToPlan(String filter,String stepName){
+        searchUsingFilter(filter,stepName);
+        List<WebElement> result = winActions.findElementsByXpath("//Table//DataItem[contains(@Name,'"+stepName+"')]");
         logger.debug("No of results="+result.size());
         Actions act = new Actions(winDriver);
         for(int i = 0 ; i < result.size() ; i ++){
@@ -72,32 +72,40 @@ public class AutomationPlans implements AutomationPlanLocators {
         String planID = plan.get(0).getText();
         logger.debug("planID="+planID);
     }
-    public void searchUsingName(String name){
-        logger.debug("searching the step by name="+name);
+    public void searchUsingFilter(String filter,String stepName){
+        logger.debug("searching the step by filter:"+filter);
         List<WebElement> comboBox = winActions.findElementsByXpath(add_step_combobox);
         for(int i = 0 ; i < comboBox.size() ; i ++){
             String dropBoxName = comboBox.get(i).getAttribute(WinAppConsts.ATTR_VALUE.value);
             if(dropBoxName.equalsIgnoreCase(WinAppConsts.ATTR_NAME.value.toLowerCase())) {
                 comboBox.get(i).click();
-                winActions.pressKeyboardKey(1,Keys.ARROW_DOWN);
-                winActions.pressKeyboardKey(1,Keys.TAB);
-                logger.info("Name or description filter is selected");
-                break;
+                if(filter.equalsIgnoreCase(ConsoleConsts.FILTER_ID.text)){
+                    winActions.pressKeyboardKey(1,Keys.ARROW_UP);
+                    winActions.pressKeyboardKey(1,Keys.TAB);
+                    logger.info("Name or description filter is selected");
+                    break;
+                }else{
+                    winActions.pressKeyboardKey(1,Keys.ARROW_DOWN);
+                    winActions.pressKeyboardKey(1,Keys.TAB);
+                    logger.info("Name or description filter is selected");
+                    break;
+                }
+
             }
         }
         List<WebElement> editFields =winActions.findElementsByXpath(edit_field_using_xpath);
-        editFields.get(1).sendKeys(name);
+        editFields.get(1).sendKeys(stepName);
         WebElement filterSearchBtn = winActions.findElementByAccessibilityId(add_step_search_btn_using_xpath);
         filterSearchBtn.click();
         logger.info("Search completed");
     }
 
-    public void createPlan(String planName,String filter){
+    public void createPlan(String planName,String filter,String stepName){
         logger.info("Plan creation in progress...");
         clickCreateBtn();
         enterPlanName(planName);
         clickAddStepBtn();
-        addStepToPlan(filter);
+        addStepToPlan(filter,stepName);
         savePlan();
         getPlanID(planName);
         logger.info("Plan Created");

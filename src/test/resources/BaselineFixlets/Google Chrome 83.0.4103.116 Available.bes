@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
+	<Fixlet>
+		<Title>Google Chrome 83.0.4103.116 Available</Title>
+		<Description><![CDATA[
+<TABLE><TBODY><TR><TD> <P>Google has released a new version of the Chrome browser (83.0.4103.116). The listed computers have an earlier version of Google Chrome installed. Follow the link for the enterprise edition of 'Google Chrome 83.0.4103.116' download on this </FONT><A href="https://enterprise.google.com/chrome/chrome-browser/#download">page</A>.</P> <P><B><FONT color=#ff0000>Important Note:</FONT></B> This Fixlet will detect the existence of an outdated Google Chrome for both the consumer edition and the enterprise edition. Installing the enterprise edition of Google Chrome <B>might not</B> uninstall nor update the consumer edition. Additionally, problems might occur when installing the enterprise edition of Google Chrome on a computer that already has the consumer edition present. BigFix recommends that the consumer edition of Google Chrome is uninstalled before installing the enterprise edition. Use Fixlet message "Google Chrome - Consumer Edition Installed" (ID 14011003) to uninstall the consumer edition of Google Chrome.</P> <P><FONT color=#ff0000><STRONG>Important Note: </STRONG></FONT>If this Fixlet is still relevant after installing the latest enterprise edition of Google Chrome, the issue is most likely that the computer has an outdated consumer edition installed. Use Fixlet message "Google Chrome - Consumer Edition Installed" (ID 14011003) to detect this condition.</P><P><B>Note:</B> Google does not provide a way to detect if the application has a 32-bit or 64-bit architecture. The only other way to confirm architecture is to examine its uninstaller executable, which BigFix does not currently support.</P><P>It is assumed that only a 64-bit version of the application is installed on a 64-bit operating system. A 32-bit version of the application that is installed on a 64-bit operating system will be converted to a 64-bit version. Currently, the conversion has no known impact and no user action is required in relation to this conversion.</P></TD></TR></TBODY></TABLE>
+]]></Description>
+		<Relevance>not exists values "PROCESSOR_ARCHITECTURE" whose (it as string as lowercase = "ia64") of keys "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" of registry</Relevance>
+		<Relevance>exists regapp "chrome.exe"</Relevance>
+		<Relevance><![CDATA[version of client >= "7"]]></Relevance>
+		<Relevance>(if( name of operating system starts with "Win" ) then platform id of operating system != 3 else false) AND (if exists property "in proxy agent context" then ( not in proxy agent context ) else true ) </Relevance>
+		<Relevance>name of operating system as lowercase starts with "win"</Relevance>
+		<Relevance>((name of it = "Win7") OR (name of it = "Win8") OR (name of it = "Win8.1") OR (name of it = "Win10") OR (name of it = "Win2012") OR (name of it = "Win2012R2") OR (name of it = "Win2008R2") OR (name of it = "Win2016")) of operating system</Relevance>
+		<Relevance><![CDATA[(exists key whose ((value "name" of it as string = "Google %c5%a9%b7%d2" or value "name" of it as string = "Google Chrome") and value "pv" of it as string as version < "83.0.4103.116") of keys "HKEY_LOCAL_MACHINE\Software\Google\Update\Clients" of registry) OR (exists key whose ((value "name" of it as string = "Google %c5%a9%b7%d2" or value "name" of it as string = "Google Chrome") and value "pv" of it as string as version < "83.0.4103.116") of keys "Software\Google\Update\Clients" of current user keys (logged on users) of registry)]]></Relevance>
+		<Category>Security Update</Category>
+		<DownloadSize>63381704</DownloadSize>
+		<Source>Google</Source>
+		<SourceID>Unspecified</SourceID>
+		<SourceReleaseDate>2020-06-22</SourceReleaseDate>
+		<SourceSeverity>High</SourceSeverity>
+		<CVENames>CVE-2020-6509</CVENames>
+		<SANSID>Unspecified</SANSID>
+		<MIMEField>
+			<Name>x-fixlet-cpe23-item-name</Name>
+			<Value>cpe:2.3:a:google:chrome:83.0.4103.116:*:*:*:*:*:*:*</Value>
+		</MIMEField>
+		<MIMEField>
+			<Name>x-fixlet-domain_attributes</Name>
+			<Value>PatchManagement 3rdPartyApp Google Chrome</Value>
+		</MIMEField>
+		<DefaultAction ID="Action1">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink><![CDATA[ to initiate the deployment process.<BR>]]></PostLink>
+			</Description>
+			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell">// Check 64bit Chrome
+if {x64 of operating system}
+prefetch googlechromestandaloneenterprise64.msi sha1:44c639cd1159e3746192df75dcaaf63ba4a0c436 size:63381704  https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B03FE9563-80F9-119F-DA3D-72FBBB94BC26%7D%26lang%3Den%26browser%3D4%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable%26brand=GCEA/dl/chrome/install/googlechromestandaloneenterprise64.msi sha256:36ade153ecb99d82fdab1a3e53d257698af7d11feade582483378561190bebc3
+
+wait msiexec.exe /q /I "__Download\googlechromestandaloneenterprise64.msi"
+
+action may require restart "44c639cd1159e3746192df75dcaaf63ba4a0c436"
+
+// Otherwise should be 32bit
+else
+prefetch googlechromestandaloneenterprise.msi sha1:c1f9b9c59d9782522127d10cf476bba72b032b95 size:62218440 https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B03FE9563-80F9-119F-DA3D-72FBBB94BC26%7D%26lang%3Den%26browser%3D4%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-stable%26brand=GCEA/dl/chrome/install/googlechromestandaloneenterprise.msi sha256:18f336e70a3624b3be18279e30181a96910ac77b3d55a5fb4978cb4fd49fb6dd
+
+wait msiexec.exe /q /I "__Download\googlechromestandaloneenterprise.msi"
+
+action may require restart "c1f9b9c59d9782522127d10cf476bba72b032b95"
+endif</ActionScript>
+		</DefaultAction>
+		<Action ID="Link2">
+			<Description>
+				<PreLink>Click </PreLink>
+				<Link>here</Link>
+				<PostLink><![CDATA[ for more information about this Google Chrome release.<BR>]]></PostLink>
+			</Description>
+			<ActionScript MIMEType="text/x-uri">http://googlechromereleases.blogspot.com/search/label/Stable%20updates</ActionScript>
+		</Action>
+	</Fixlet>
+</BES>
