@@ -1,7 +1,7 @@
 package com.hcl.sa.objectRepository;
 
 public interface AutomationPlanLocators {
-      String create_btn_using_xpath = "//*[@AutomationId='planDetailCreateButton']/Text[@Name='Create']";
+      String create_btn_using_xpath = "//*[@AutomationId='planDetailCreateButton']/Text[contains(@Name,\"Create\")]";
       String name_field_using_accessbilityID = "planDetailNameVal";
       String steps_tab_using_name= "Steps";
       String add_step_using_name = "Add Step";

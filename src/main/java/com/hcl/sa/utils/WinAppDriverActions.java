@@ -133,7 +133,7 @@ public class WinAppDriverActions {
         act.sendKeys(Keys.TAB).build().perform();
     }
 
-    public Actions pressKeyboardKey(int noOfTimes, Keys keys) {
+    public Actions pressKeyboardKey(int noOfTimes, CharSequence keys) {
         Actions act = new Actions(winDriver);
         for (int i = 0; i < noOfTimes; i++) {
             act.sendKeys(keys).build().perform();
@@ -141,6 +141,7 @@ public class WinAppDriverActions {
         act.release();
         return act;
     }
+
 
     public void waitForListVisibility(List<WebElement> list, int timeout) {
         logger.debug("Waiting for list visibility whose size is ", timeout);

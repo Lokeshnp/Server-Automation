@@ -137,7 +137,6 @@ public class ConsoleActions implements XmlLocators {
             actionID = getActionID(response.asInputStream());
             waitTillXmlResponseReceived(actionID);
             String actionStatus = waitTillActionIsFixed(actionID);
-            SuperClass.specStore.put(ConsoleConsts.ACTION_STATUS, actionStatus);
             verifyActionStatus(fixletID, actionID, actionStatus, targetVmIpAddress);
         }
     }
@@ -200,41 +199,40 @@ public class ConsoleActions implements XmlLocators {
         logger.debug("Response after deleting the action = " + response.asString());
     }
 
-    public HashMap<String,String> importFixlet(String folderPath,RequestSpecification requestSpecification) throws IOException, SAXException {
-        HashMap<String,String> fixletID = new HashMap<>();
+    public HashMap<String, String> importFixlet(String folderPath, RequestSpecification requestSpecification) throws IOException, SAXException {
+        HashMap<String, String> fixletID = new HashMap<>();
         File[] files = new File(folderPath).listFiles();
         for (File file : files) {
             if (file.isFile()) {
                 String fileName = file.getName();
                 String apiRequestBody = commonFunctions.readTextFile(folderPath + fileName).toString();
                 String uri = jsonParser.getUriToImportFixlet(jsonParser.getConsoleApiObject());
-                Response response = apiRequests.POST(requestSpecification, uri,apiRequestBody);
+                Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
                 logger.debug("API request Response after importing the fixlet into custom site =/n" + response.asString());
                 logger.info("Fixlet got imported to the site " + siteName);
-                fixletID.put(fileName,xmlParser.getElementOfXmlByXpath(response.asInputStream(),XmlLocators.FIXLET_ID_XPATH).get(0));
+                fixletID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.FIXLET_ID_XPATH).get(0));
             }
         }
-        logger.debug("Imported Fixlet details="+fixletID);
-        SuperClass.specStore.put(ConsoleConsts.FIXLET_ID_LIST,fixletID);
+        logger.debug("Imported Fixlet details=" + fixletID);
+        SuperClass.specStore.put(ConsoleConsts.FIXLET_ID_LIST, fixletID);
         return fixletID;
     }
 
-
-    public String createBaseline(String siteType,String siteName) throws IOException, SAXException, TransformerException {
+    public String createBaseline(String siteType, String siteName) throws IOException, SAXException, TransformerException {
         String baselineFolderPath = CommonFunctions.getPath(ConsoleConsts.BASELINE_FIXLETS_FOLDER.text);
         String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
-        String sourceSiteName = ConsoleConsts.CUSTOM_SITE.text+"_"+siteName;
-        logger.debug("Baseline Folder path="+baselineFolderPath);
+        String sourceSiteName = ConsoleConsts.CUSTOM_SITE.text + "_" + siteName;
+        logger.debug("Baseline Folder path=" + baselineFolderPath);
         RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
-        contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
-        pathParams(commonFunctions.commonParams(siteType,siteName));
-        importFixlet(CommonFunctions.getPath(baselineFolderPath),requestSpecification);
-        String body = payload.createBaseline(new FileInputStream(baselinePayloadPath),sourceSiteName);
-        logger.debug("API  Request body for sending API="+body);
-        String uri  = jsonParser.getUriToCreateBaseline(jsonParser.getConsoleApiObject());
-        Response response = apiRequests.POST(requestSpecification, uri,body);
-        logger.debug("Create baseline API response="+response.asString());
-        return xmlParser.getElementOfXmlByXpath(response.asInputStream(),XmlLocators.BASELINE_ID_XPATH).get(0);
+                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                pathParams(commonFunctions.commonParams(siteType, siteName));
+        importFixlet(CommonFunctions.getPath(baselineFolderPath), requestSpecification);
+        //TODO : Source site url computer name should be dynamic
+        String body = payload.createBaseline(new FileInputStream(baselinePayloadPath), sourceSiteName);
+        logger.debug("API  Request body for sending API=" + body);
+        String uri = jsonParser.getUriToCreateBaseline(jsonParser.getConsoleApiObject());
+        Response response = apiRequests.POST(requestSpecification, uri, body);
+        logger.debug("Create baseline API response=" + response.asString());
+        return xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.BASELINE_ID_XPATH).get(0);
     }
-
 }

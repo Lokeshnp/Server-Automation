@@ -14,13 +14,13 @@ public class Reusable_Steps {
     private final Logger logger = LogManager.getLogger(Reusable_Steps.class);
 
     @Step("Login to Bigfix console")
-    public void consoleLogin(){
-     login.consoleLogin(Credentials.CONSOLE);
-     logger.info("Login to Console is successful");
+    public void consoleLogin() {
+        login.consoleLogin(Credentials.CONSOLE);
+        logger.info("Login to Console is successful");
     }
 
     @Step("Navigate to Automation Plan Dashboard")
-    public void openAutomationPlanDashboard(){
+    public void openAutomationPlanDashboard() {
         allContent.openAutomationPlanDashboard();
         logger.info("User is able to open automation plan dashboard");
     }

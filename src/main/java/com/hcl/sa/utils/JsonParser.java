@@ -3,6 +3,7 @@ package com.hcl.sa.utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
+import com.hcl.sa.constants.CreatePlanConsts;
 import com.hcl.sa.constants.VsphereConsts;
 
 public class JsonParser {
@@ -55,4 +56,25 @@ public class JsonParser {
     public String getUriToCreateBaseline(JsonObject jsonObject) {
         return jsonObject.get(ConsoleConsts.CREATE_BASELINE.text).getAsString();
     }
+
+    public JsonObject getPlanConsoleApiObject() {
+        return consoleObj.getAsJsonObject().get(CreatePlanConsts.WASLIBERTY_API_URI.text).getAsJsonObject();
+    }
+
+    public String getUriToFetchPlanXml(JsonObject jsonObject) {
+        return jsonObject.get(CreatePlanConsts.PLAN_EXECUTION_TEMPLATE.text).getAsString();
+    }
+
+    public String getUriToInitiatePlanExecutionAction(JsonObject jsonObject) {
+        return jsonObject.get(CreatePlanConsts.EXECUTE_PLAN.text).getAsString();
+    }
+
+    public String getUriToFetchListOfFixlets(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.LIST_OF_FIXLETS.text).getAsString();
+    }
+
+    public String getUriToDeletePlan(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.DELETE_PLAN.text).getAsString();
+    }
 }
+

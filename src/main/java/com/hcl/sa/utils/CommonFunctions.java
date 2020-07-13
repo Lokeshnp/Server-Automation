@@ -59,11 +59,20 @@ public class CommonFunctions {
         return commonPara;
     }
 
-    public HashMap<String, String> commonParams(String siteType,String siteName) {
+    public HashMap<String, String> commonParams(String siteType, String siteName) {
         HashMap<String, String> commonPara = new HashMap<>();
         commonPara.put(ConsoleConsts.SITE_TYPE.text, jsonParser.getSiteTypeObject().get(siteType).getAsString());
         commonPara.put(ConsoleConsts.SITE_NAME.text, jsonParser.getSiteNameObject().get(siteName).getAsString());
-        logger.debug("Common Params="+commonPara);
+        logger.debug("Common Params=" + commonPara);
+        return commonPara;
+    }
+
+    public HashMap<String, String> commonParams(String siteType, String siteName, String fixletID) {
+        HashMap<String, String> commonPara = new HashMap<>();
+        commonPara.put(ConsoleConsts.SITE_TYPE.text, jsonParser.getSiteTypeObject().get(siteType).getAsString());
+        commonPara.put(ConsoleConsts.SITE_NAME.text, jsonParser.getSiteNameObject().get(siteName).getAsString());
+        commonPara.put(ConsoleConsts.FIXLET_ID.text, fixletID);
+        logger.debug("Common Params=" + commonPara);
         return commonPara;
     }
 
@@ -85,12 +94,12 @@ public class CommonFunctions {
 
     }
 
-    public List<String> getAllFileNames(String folderPath){
+    public List<String> getAllFileNames(String folderPath) {
         List<String> fileNames = new ArrayList<>();
         File directory = new File(folderPath);
         File[] files = directory.listFiles();
-        for(File file:files){
-            if(file.isFile()){
+        for (File file : files) {
+            if (file.isFile()) {
                 fileNames.add(file.getName());
             }
         }

@@ -8,7 +8,9 @@
       "compProperties": "api/computer/{computerID}",
       "deleteAction": "/api/action/{actionID}",
       "importFixlet": "api/import/{siteType}/{siteName}",
-      "createBaselines":"api/baselines/{siteType}/{siteName}"
+      "createBaselines":"api/baselines/{siteType}/{siteName}",
+      "listOfFixlets": "api/fixlets/{siteType}/{siteName}",
+      "deletePlan": "api/fixlet/master/{fixletID}"
     },
     "siteType": {
       "external": "external",
@@ -16,7 +18,13 @@
     },
     "siteName": {
       "serverAutomation": "Server Automation",
-      "Abhinav":"Abhinav"
+      "Abhinav":"Abhinav",
+      "Pooja":"Pooja",
+      "master": "master"
+    },
+    "wasLibertyApi" : {
+      "planExecutionTemplate" : "serverautomation/plan/master/{planID}",
+      "executePlan" : "serverautomation/plan/master/{planID}"
     }
   }
 }

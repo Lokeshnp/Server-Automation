@@ -27,6 +27,7 @@ public class Payload {
         HashMap<String,String> fixletID =(HashMap<String,String>)SuperClass.specStore.get(ConsoleConsts.FIXLET_ID_LIST);
         HashMap<String,String> attr = new HashMap<>();
         attr.put(XMLConsts.SOURCE_SITE_URL_ATTR.name(),XMLConsts.SOURCE_SITE_URL.text.replace(XMLConsts.SITE_NAME_REG_EX.text,sourceSiteName));
+        System.out.println("xml "+XMLConsts.SOURCE_SITE_URL.text.replace(XMLConsts.SITE_NAME_REG_EX.text,sourceSiteName));
         HashMap<String,HashMap<String,String>> baselineComponentAttr = new HashMap<>();
         for(Map.Entry<String,String> sourceID:fixletID.entrySet()){
             baselineComponentAttr.put(sourceID.getValue(),attr);

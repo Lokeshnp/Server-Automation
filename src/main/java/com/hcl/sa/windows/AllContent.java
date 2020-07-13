@@ -39,10 +39,27 @@ public class AllContent {
         logger.info("Navigated to external site type");
     }
 
-    //TODO HERE IT IS GIVING ISSUE IF EXTRA COLUMN IS ADDED SO LATER IT NEEDS TO BE CHANGED WITH BY PRESSING CTRL KEYBOARD SHOURTCUT
+    public int getColumnIndexOfExtSitesWin(String columName){
+        int index = 0;
+        List<WebElement> headerList = winActions.findElementsByXpath(AllContentsLocators.ext_sites_col_names_xpath);
+        for(int i = 0 ; i < headerList.size();i++){
+            index = index + 1;
+            String actColumnName = headerList.get(i).getText();
+            if(columName.equalsIgnoreCase(actColumnName)){
+                break;
+            }
+        }
+        logger.debug("Column Name="+columName+">>>>index is:"+index);
+        return index;
+    }
+
+
     public int getServerAutomationSiteNameIndex() {
         int saIndex = 0;
-        List<WebElement> externalSitesList = winActions.findElementsByXpath(AllContentsLocators.external_sites_xpath);
+        int colIndex = getColumnIndexOfExtSitesWin(WinAppConsts.ATTR_NAME.value);
+        String externalSites = AllContentsLocators.external_sites_xpath.replace("colIndex",String.valueOf(colIndex));
+        System.out.println("exteral Sites xpath="+externalSites);
+        List<WebElement> externalSitesList = winActions.findElementsByXpath(externalSites);
         logger.debug("External Sites List size=" + externalSitesList.size());
         for (int i = 0; i < externalSitesList.size(); i++) {
             String siteName = externalSitesList.get(i).getAttribute(WinAppConsts.ATTR_NAME.value);
@@ -60,7 +77,7 @@ public class AllContent {
     public void expandServerAutomationSite() {
         navigateToExternalSiteType();
         int saSiteNameIndex = getServerAutomationSiteNameIndex();
-        clickOnAllContentWin();
+        winActions.moveByOffsetAndClick(0, 170);
         winActions.pressKeyboardKey(1, Keys.ARROW_RIGHT);
         winActions.pressKeyboardKey(saSiteNameIndex, Keys.ARROW_DOWN);
         winActions.pressKeyboardKey(1, Keys.ARROW_RIGHT);
@@ -74,12 +91,11 @@ public class AllContent {
     }
 
     public void openAutomationPlanDashboard() {
+        winActions.winDriver.getKeyboard().sendKeys(Keys.CONTROL,"1",Keys.CONTROL);
         expandServerAutomationSite();
         expandServerAutomationDashboard();
         winActions.pressKeyboardKey(2, Keys.ARROW_DOWN);
         winActions.pressKeyboardKey(1, Keys.ENTER);
         logger.info("User is able to open automation plan dashboard");
     }
-
-
 }

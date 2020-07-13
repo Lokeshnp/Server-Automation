@@ -79,4 +79,13 @@ public class SuperClass {
         runtime = Runtime.getRuntime();
         return runtime;
     }
+
+    public void killWinAppDriver(){
+        try {
+            getInstance().getRunTime().exec("taskkill /f /im WinAppDriver.exe");
+            getInstance().getRunTime().exec("taskkill /f /im cmd.exe");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
