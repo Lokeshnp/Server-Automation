@@ -11,5 +11,9 @@ public interface AutomationPlanLocators {
       String edit_field_using_xpath = "//*[@LocalizedControlType='edit']";
       String add_step_combobox = "//*[@LocalizedControlType='combo box']";
       String add_step_search_btn_using_xpath = "filterSearchButton";
-
+      String create_btn_access_id = "planDetailCreateButton";
+      String search_plan_text_box_access_id = "dijit_form_TextBox_0";
+      String add_step_combobox_tagname = "ComboBox";
+      String name_filter_text_box_access_id = "filterWidgetTextbox_2";
+      String id_filter_text_box_tagName = "Edit";
 }

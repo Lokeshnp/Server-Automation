@@ -169,5 +169,9 @@ public class WinAppDriverActions {
         WebDriverWait wait = new WebDriverWait(winDriver, timeout);
         wait.until(ExpectedConditions.invisibilityOf(ele));
     }
+
+    public List<WebElement> findElementsByTagName(String tagName){
+        return  winDriver.findElementsByTagName(tagName);
+    }
 }
 

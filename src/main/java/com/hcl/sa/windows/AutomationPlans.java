@@ -1,10 +1,7 @@
 package com.hcl.sa.windows;
 
 import com.google.gson.JsonObject;
-import com.hcl.sa.constants.ConsoleConsts;
-import com.hcl.sa.constants.CreatePlanConsts;
-import com.hcl.sa.constants.WinAppConsts;
-import com.hcl.sa.constants.XMLConsts;
+import com.hcl.sa.constants.*;
 import com.hcl.sa.objectRepository.AutomationPlanLocators;
 import com.hcl.sa.utils.*;
 import io.appium.java_client.windows.WindowsDriver;
@@ -48,10 +45,11 @@ public class AutomationPlans implements AutomationPlanLocators {
     ConsoleActions consoleActions = new ConsoleActions();
     CommonFunctions commonFunctions = new CommonFunctions();
 
+
     public void clickCreateBtn() {
-        WebElement createBtn = winActions.findElementByXpath(create_btn_using_xpath);
-        winActions.waitForElementVisibilityAndClick(createBtn, 20);
-        logger.info("create button clicked");
+        WebElement createBtn = winActions.winDriver.findElementByAccessibilityId(create_btn_access_id);
+        winActions.hardWait(3000); //js error on click of create button
+        winActions.waitForElementVisibilityAndClick(createBtn, TimeOutConsts.WAIT_10_SECONDS.seconds);
     }
 
     public void enterPlanName(String planName) {
@@ -69,20 +67,27 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.info("Add step button clicked");
     }
 
-    public void addStepToPlan(String filter, String stepName) {
-        searchUsingFilter(filter, stepName);
-        List<WebElement> result = winActions.findElementsByXpath("//Table//DataItem[contains(@Name,'" + stepName + "')]");
-        logger.debug("No of results=" + result.size());
-        Actions act = new Actions(winDriver);
-        for (int i = 0; i < result.size(); i++) {
-            act.sendKeys(Keys.CONTROL).build().perform();
-            result.get(i).click();
-            winActions.hardWait(500);
-            act.keyUp(Keys.CONTROL).build().perform();
-        }
-        winActions.moveToWebElementAndClick(winActions.findElementByXpath(add_button_using_xpath));
-        act.release().perform();
+    public void addStepToPlan(String fixletID, String fixletName) {
+        searchUsingFilter(fixletID, fixletName);
+        //TODO REMOVE LATER IF BELOW CODE WORKS
+//        List<WebElement> result = winActions.findElementByName(fixletName);
+//        logger.debug("No of results="+result.size());
+//        Actions act = new Actions(winDriver);
+//        for(int i = 0 ; i < result.size() ; i ++){
+//            if(result.get(i).getAttribute(ConsoleConsts.LOCALIZED_CONTROL_TYPE.text).equalsIgnoreCase("item")){
+//                act.sendKeys(Keys.CONTROL).build().perform();
+//                result.get(i).click();
+//                winActions.hardWait(500);
+//                act.keyUp(Keys.CONTROL).build().perform();
+//            }
+//        }
+        winActions.findElementByName(fixletName).click();
+        winActions.pressKeyboardKey(1, Keys.TAB);
+        winActions.pressKeyboardKey(1, Keys.ENTER);
+//        act.release().perform();
+        logger.info("Step with name:" + fixletName + " is added to plan");
     }
+
 
     public void savePlan() {
         winActions.findElementByName(save_btn_using_name).click();
@@ -91,23 +96,27 @@ public class AutomationPlans implements AutomationPlanLocators {
     }
 
     public void searchPlan(String planName) {
-        List<WebElement> editFields = winActions.findElementsByXpath(edit_field_using_xpath);
-        editFields.get(0).clear();
-        editFields.get(0).sendKeys(planName);
+//        List<WebElement> editFields =winActions.findElementsByXpath(edit_field_using_xpath);
+//        editFields.get(0).sendKeys(planName);
+        WebElement searchPlanTextBox = winActions.findElementByAccessibilityId(search_plan_text_box_access_id);
+        searchPlanTextBox.clear();
+        searchPlanTextBox.sendKeys(planName);
+        // winActions.waitForListVisibility(winActions.findElementsByName(planName),TimeOutConsts.WAIT_10_SECONDS.seconds);
+        winActions.findElementByName(planName).click();
     }
 
     public String getPlanID(String planName) {
         searchPlan(planName);
-        winActions.hardWait(6000); //sync issue
+        //winActions.hardWait(6000); //sync issue
         List<WebElement> plan = winActions.findElementsByXpath("(//Table//DataItem[@Name='" + planName + "']/preceding-sibling::*)[1]");
         String planID = plan.get(0).getText();
         logger.debug("planID=" + planID);
         return planID;
     }
 
-    public void searchUsingFilter(String fixletName, String fixletID) {
+    public void searchUsingFilter(String fixletID, String fixlelName) {
         winActions.findElementByName("+").click();
-        List<WebElement> comboBox = winActions.findElementsByXpath(add_step_combobox);
+        List<WebElement> comboBox = winActions.findElementsByTagName(add_step_combobox_tagname);
         for (int i = 0; i < comboBox.size(); i++) {
             String dropBoxName = comboBox.get(i).getAttribute(WinAppConsts.ATTR_VALUE.value);
             if (dropBoxName.equalsIgnoreCase(ConsoleConsts.ACTION.text.toLowerCase())) {
@@ -118,8 +127,8 @@ public class AutomationPlans implements AutomationPlanLocators {
                 break;
             }
         }
-        List<WebElement> editFields = winActions.findElementsByXpath(edit_field_using_xpath);
-        editFields.get(1).sendKeys(fixletName);
+        winActions.findElementByAccessibilityId(name_filter_text_box_access_id).sendKeys(fixlelName);
+        List<WebElement> editFields = winActions.findElementsByTagName(id_filter_text_box_tagName);
         editFields.get(2).sendKeys(fixletID);
         WebElement filterSearchBtn = winActions.findElementByAccessibilityId(add_step_search_btn_using_xpath);
         filterSearchBtn.click();
@@ -133,7 +142,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         for (Map.Entry<String, String> fixletDetail : fixletDetails.entrySet()) {
             clickAddStepBtn();
             String fixletName = fixletDetail.getKey().split(".bes")[0].trim();
-            addStepToPlan(fixletName, fixletDetail.getValue());
+            addStepToPlan(fixletDetail.getValue(), fixletName);
         }
         savePlan();
         String planActionId = getPlanID(planName);

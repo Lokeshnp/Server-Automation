@@ -57,6 +57,10 @@ public class JsonParser {
         return jsonObject.get(ConsoleConsts.CREATE_BASELINE.text).getAsString();
     }
 
+    public String getUriToCreateTask(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.CREATE_TASKS.text).getAsString();
+    }
+
     public JsonObject getPlanConsoleApiObject() {
         return consoleObj.getAsJsonObject().get(CreatePlanConsts.WASLIBERTY_API_URI.text).getAsJsonObject();
     }

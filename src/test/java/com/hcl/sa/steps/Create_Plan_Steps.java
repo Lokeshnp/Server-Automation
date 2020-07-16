@@ -89,4 +89,24 @@ public class Create_Plan_Steps {
         automationPlans.executePlan(planID, fixletDetails);
         logger.info("Executed plan id : \n" + planID);
     }
+
+    @Step("Create automation plan with multiple tasks on following OS")
+    public void createPlanWithMultipleTask() throws IOException, SAXException {
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
+                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text));
+        HashMap<String, String> fixletDetails = consoleActions.createTask("C:\\IntegrateCode\\sa-dashboard-automation\\src\\test\\resources\\PlanTasks\\", requestSpecification);
+        String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_TASKS_PLAN.text, fixletDetails);
+        SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
+        SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, fixletDetails);
+        logger.info("Created plan id : \n" + planID);
+    }
+
+    @Step("Then execute automation plan with multiple tasks on following OS")
+    public void executePlanWithTasks() throws TransformerException, SAXException, IOException {
+        String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
+        HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
+        automationPlans.executePlan(planID, fixletDetails);
+        logger.info("Executed plan id : \n" + planID);
+    }
 }

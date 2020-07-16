@@ -10,6 +10,6 @@ public interface XmlLocators {
     String ACTION_STATUS_XPATH = "//Name[starts-with(text(), 'Install Latest Automation Plan Engine')]/parent::Action[@LastModified='date']/ID/text()";
     String FIXLET_ID_XPATH = "//Fixlet/ID/text()";
     String BASELINE_ID_XPATH = "//ID/text()";
+    String TASK_ID_XPATH = "//Task/ID/text()";
     String STATUS = "//Status/text()";
-
 }

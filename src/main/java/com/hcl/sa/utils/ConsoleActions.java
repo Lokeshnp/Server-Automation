@@ -218,6 +218,25 @@ public class ConsoleActions implements XmlLocators {
         return fixletID;
     }
 
+    public HashMap<String, String> createTask(String folderPath, RequestSpecification requestSpecification) throws IOException, SAXException {
+        HashMap<String, String> taskID = new HashMap<>();
+        File[] files = new File(folderPath).listFiles();
+        for (File file : files) {
+            if (file.isFile()) {
+                String fileName = file.getName();
+                String apiRequestBody = commonFunctions.readTextFile(folderPath + fileName).toString();
+                String uri = jsonParser.getUriToCreateTask(jsonParser.getConsoleApiObject());
+                Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
+                logger.debug("API request Response after creating the task into custom site =/n" + response.asString());
+                logger.info("Tasks got imported to the site " + siteName);
+                taskID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.TASK_ID_XPATH).get(0));
+            }
+        }
+        logger.debug("Imported Fixlet details=" + taskID);
+        SuperClass.specStore.put(ConsoleConsts.FIXLET_ID_LIST, taskID);
+        return taskID;
+    }
+
     public String createBaseline(String siteType, String siteName) throws IOException, SAXException, TransformerException {
         String baselineFolderPath = CommonFunctions.getPath(ConsoleConsts.BASELINE_FIXLETS_FOLDER.text);
         String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
