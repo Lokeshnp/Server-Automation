@@ -2,32 +2,27 @@ package com.hcl.sa.utils;
 
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
+import com.hcl.sa.constants.CreatePlanConsts;
 import com.hcl.sa.constants.TimeOutConsts;
 import com.hcl.sa.constants.XMLConsts;
 import com.hcl.sa.objectRepository.XmlLocators;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
+import java.io.InputStream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class ConsoleActions implements XmlLocators {
@@ -47,9 +42,9 @@ public class ConsoleActions implements XmlLocators {
         return response;
     }
 
-    public List<String> getApplicableComputersID(String fixletID) throws IOException, SAXException {
+    public List<String> getApplicableComputersID(HashMap<String, String> params) throws IOException, SAXException {
         List<String> compIDsList = new ArrayList<String>();
-        Response response = getRelevantComputers(commonFunctions.commonParams(fixletID));
+        Response response = getRelevantComputers(params);
         logger.debug("Relevant Machines = " + response.asString());
         List<String> computersList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), COMP_ATTR_XPATH);
         computersList.forEach(computer -> {
@@ -65,7 +60,7 @@ public class ConsoleActions implements XmlLocators {
         long startTime = System.currentTimeMillis();
         boolean waitUntillApplicableCompsDisp = true;
         do {
-            Response relevantMachines = getRelevantComputers(commonFunctions.commonParams(fixletID));
+            Response relevantMachines = getRelevantComputers(commonFunctions.defaultSiteDetails(fixletID));
             computerTagCount = xmlParser.getElementsByTagName(relevantMachines.asInputStream(), XMLConsts.COMPUTER_TAGNAME.text).getLength();
             waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
             if (!waitUntillApplicableCompsDisp) {
@@ -76,10 +71,10 @@ public class ConsoleActions implements XmlLocators {
         return computerTagCount;
     }
 
-    public String getApplicableComputerID(String fixletID, String targetVmIpAddress) throws IOException, SAXException {
+    public String getApplicableComputerID(HashMap<String, String> params, String targetVmIpAddress) throws IOException, SAXException {
         String ipAddress = null;
         String computerID = null;
-        List<String> computerIDs = getApplicableComputersID(fixletID);
+        List<String> computerIDs = getApplicableComputersID(params);
         int computerIDsSize = computerIDs.size();
         for (int i = 0; i < computerIDsSize; i++) {
             String uri = jsonParser.getUriToFetchCompProperties(consoleApiObject);
@@ -90,17 +85,17 @@ public class ConsoleActions implements XmlLocators {
                 computerID = computerIDs.get(i);
                 break;
             } else {
-                getApplicableComputerID(fixletID, targetVmIpAddress);
+                getApplicableComputerID(params, targetVmIpAddress);
             }
         }
-        logger.debug("Fixlet with ID " + fixletID + " becomes relevant to a machine with IP Address " + ipAddress);
-        logger.debug("Computer ID for the fixlet ID " + fixletID + " is " + computerID);
+        logger.debug("Fixlet with ID " + params.get(ConsoleConsts.FIXLET_ID.text) + " becomes relevant to a machine with IP Address " + ipAddress);
+        logger.debug("Computer ID for the fixlet ID " + params.get(ConsoleConsts.FIXLET_ID.text) + " is " + computerID);
         SuperClass.specStore.put(ConsoleConsts.COMPUTER_ID, computerID);
         return computerID;
     }
 
-    public Response initiateAction(String fixletID, String computerID) {
-        //TODO, need to change the below method of passing string to create a new xml file
+    public Response initiateAction(String actionBody) {
+        /*//TODO, need to change the below method of passing string to create a new xml file
         String actionBody = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
                 "<BES xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"BES.xsd\">\r\n" +
                 " <SourcedFixletAction>\r\n" +
@@ -114,7 +109,7 @@ public class ConsoleActions implements XmlLocators {
                 "   </Target>\r\n" +
                 "  <Parameter Name=\"_BESClient_EMsg_Detail\">1000</Parameter>\r\n" +
                 " </SourcedFixletAction>\r\n" +
-                "</BES>";
+                "</BES>";*/
         Response response = apiRequests.POST(actionBody, jsonParser.getUriToInitiateAction(consoleApiObject));
         logger.debug("Response after initiating the action: \n" + response.asString());
         return response;
@@ -126,18 +121,20 @@ public class ConsoleActions implements XmlLocators {
         return actionID;
     }
 
-    public void takeAction(String fixletID) throws IOException, SAXException, ParserConfigurationException {
+    public void takeAction(HashMap<String, String> params) throws IOException, SAXException, ParserConfigurationException, TransformerException {
         Response response = null;
         String targetVmIpAddress = commonFunctions.getIpAddress(ConsoleConsts.BIGFIX_SERVER_URI.text);
-        String computerID = getApplicableComputerID(fixletID, targetVmIpAddress);
-        Integer computerTagCount = waitUntilApplicableCompsVisible(fixletID);
+        String computerID = getApplicableComputerID(params, targetVmIpAddress);
+        Integer computerTagCount = waitUntilApplicableCompsVisible(params.get(ConsoleConsts.FIXLET_ID.text));
         String actionID = null;
         if (computerTagCount == 1) {
-            response = initiateAction(fixletID, computerID);
+            String initiateActionPayloadPath = CommonFunctions.getPath(ConsoleConsts.INITIATE_ACTION_PAYLOAD_PATH.text);
+            String body = payload.createAction(new FileInputStream(initiateActionPayloadPath), params, computerID);
+            response = initiateAction(body);
             actionID = getActionID(response.asInputStream());
             waitTillXmlResponseReceived(actionID);
             String actionStatus = waitTillActionIsFixed(actionID);
-            verifyActionStatus(fixletID, actionID, actionStatus, targetVmIpAddress);
+            verifyActionStatus(params.get(ConsoleConsts.FIXLET_ID.text), actionID, actionStatus, targetVmIpAddress);
         }
     }
 
@@ -200,7 +197,7 @@ public class ConsoleActions implements XmlLocators {
     }
 
     public HashMap<String, String> importFixlet(String folderPath, RequestSpecification requestSpecification) throws IOException, SAXException {
-        HashMap<String, String> fixletID = new HashMap<>();
+        HashMap<String, String> fixletDetails = new HashMap<>();
         File[] files = new File(folderPath).listFiles();
         for (File file : files) {
             if (file.isFile()) {
@@ -210,12 +207,12 @@ public class ConsoleActions implements XmlLocators {
                 Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
                 logger.debug("API request Response after importing the fixlet into custom site =/n" + response.asString());
                 logger.info("Fixlet got imported to the site " + siteName);
-                fixletID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.FIXLET_ID_XPATH).get(0));
+                fixletDetails.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.FIXLET_ID_XPATH).get(0));
             }
         }
-        logger.debug("Imported Fixlet details=" + fixletID);
-        SuperClass.specStore.put(ConsoleConsts.FIXLET_ID_LIST, fixletID);
-        return fixletID;
+        logger.debug("Imported Fixlet details=" + fixletDetails);
+        SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, fixletDetails);
+        return fixletDetails;
     }
 
     public HashMap<String, String> createTask(String folderPath, RequestSpecification requestSpecification) throws IOException, SAXException {
@@ -232,12 +229,13 @@ public class ConsoleActions implements XmlLocators {
                 taskID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.TASK_ID_XPATH).get(0));
             }
         }
-        logger.debug("Imported Fixlet details=" + taskID);
-        SuperClass.specStore.put(ConsoleConsts.FIXLET_ID_LIST, taskID);
+        logger.debug("Imported task details=" + taskID);
+        SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, taskID);
         return taskID;
     }
 
-    public String createBaseline(String siteType, String siteName) throws IOException, SAXException, TransformerException {
+    public HashMap<String, String> createBaseline(String siteType, String siteName) throws IOException, SAXException, TransformerException {
+        HashMap<String, String> baselineDetails = new HashMap<>();
         String baselineFolderPath = CommonFunctions.getPath(ConsoleConsts.BASELINE_FIXLETS_FOLDER.text);
         String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
         String sourceSiteName = ConsoleConsts.CUSTOM_SITE.text + "_" + siteName;
@@ -252,6 +250,83 @@ public class ConsoleActions implements XmlLocators {
         String uri = jsonParser.getUriToCreateBaseline(jsonParser.getConsoleApiObject());
         Response response = apiRequests.POST(requestSpecification, uri, body);
         logger.debug("Create baseline API response=" + response.asString());
-        return xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.BASELINE_ID_XPATH).get(0);
+        baselineDetails.put("Custom Baseline", xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.BASELINE_ID_XPATH).get(0));
+        SuperClass.specStore.put(CreatePlanConsts.BASELINE_DETAILS, baselineDetails);
+        return baselineDetails;
+    }
+
+    public HashMap<String, String> createBaselineHavingTasks(String siteType, String siteName) throws IOException, SAXException, TransformerException {
+        HashMap<String, String> baselineDetails = new HashMap<>();
+        String baselineFolderPath = CommonFunctions.getPath(ConsoleConsts.BASELINE_TASKS_FOLDER.text);
+        String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
+        String sourceSiteName = ConsoleConsts.CUSTOM_SITE.text + "_" + siteName;
+        logger.debug("Baseline Folder path=" + baselineFolderPath);
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
+                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                pathParams(commonFunctions.commonParams(siteType, siteName));
+        createTask(CommonFunctions.getPath(baselineFolderPath), requestSpecification);
+        //TODO : Source site url computer name should be dynamic
+        String body = payload.createBaseline(new FileInputStream(baselinePayloadPath), sourceSiteName);
+        logger.debug("API  Request body for sending API=" + body);
+        String uri = jsonParser.getUriToCreateBaseline(jsonParser.getConsoleApiObject());
+        Response response = apiRequests.POST(requestSpecification, uri, body);
+        logger.debug("Create baseline with Task API response=" + response.asString());
+        baselineDetails.put("Custom Baseline", xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.BASELINE_ID_XPATH).get(0));
+        SuperClass.specStore.put(CreatePlanConsts.BASELINE_DETAILS, baselineDetails);
+        return baselineDetails;
+    }
+
+    public HashMap<String, String> createFixletsAndTasks(String folderPath, RequestSpecification requestSpecification) throws IOException, SAXException, ParserConfigurationException {
+        HashMap<String, String> FixletAndTaskID = new HashMap<>();
+        File[] files = new File(folderPath).listFiles();
+        for (File file : files) {
+            if (file.isFile()) {
+                String fileName = file.getName();
+                String apiRequestBody = commonFunctions.readTextFile(folderPath + fileName).toString();
+                InputStream inputData = new ByteArrayInputStream(apiRequestBody.getBytes());
+                NodeList elements = xmlParser.getNodeList(inputData, "//BES/*");
+                String type = null;
+                for (int i = 0; i < elements.getLength(); ++i) {
+                    type = elements.item(i).getNodeName();
+                }
+                if (type == "Fixlet") {
+                    String uri = jsonParser.getUriToImportFixlet(jsonParser.getConsoleApiObject());
+                    Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
+                    logger.debug("API request Response after importing the fixlet into custom site =/n" + response.asString());
+                    logger.info("Fixlet got imported to the site " + siteName);
+                    FixletAndTaskID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.FIXLET_ID_XPATH).get(0));
+                } else if (type == "Task") {
+                    String uri = jsonParser.getUriToCreateTask(jsonParser.getConsoleApiObject());
+                    Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
+                    logger.debug("API request Response after creating the task into custom site =/n" + response.asString());
+                    logger.info("Tasks got imported to the site " + siteName);
+                    FixletAndTaskID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.TASK_ID_XPATH).get(0));
+                }
+            }
+        }
+        logger.debug("Imported Fixlet and Task details=" + FixletAndTaskID);
+        SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, FixletAndTaskID);
+        return FixletAndTaskID;
+    }
+
+    public HashMap<String, String> createBaselineHavingFixletsAndTasks(String siteType, String siteName) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+        HashMap<String, String> baselineDetails = new HashMap<>();
+        String baselineFixletsAndTasksFolderPath = CommonFunctions.getPath(ConsoleConsts.BASELINE_FIXLETSANDTASKS_FOLDER.text);
+        String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
+        String sourceSiteName = ConsoleConsts.CUSTOM_SITE.text + "_" + siteName;
+        logger.debug("Baseline Fixlets and Tasks Folder path=" + baselineFixletsAndTasksFolderPath);
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
+                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                pathParams(commonFunctions.commonParams(siteType, siteName));
+        createFixletsAndTasks(CommonFunctions.getPath(baselineFixletsAndTasksFolderPath), requestSpecification);
+        //TODO : Source site url computer name should be dynamic
+        String body = payload.createBaseline(new FileInputStream(baselinePayloadPath), sourceSiteName);
+        logger.debug("API  Request body for sending API=" + body);
+        String uri = jsonParser.getUriToCreateBaseline(jsonParser.getConsoleApiObject());
+        Response response = apiRequests.POST(requestSpecification, uri, body);
+        logger.debug("Create baseline with Task API response=" + response.asString());
+        baselineDetails.put("Custom Baseline", xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.BASELINE_ID_XPATH).get(0));
+        SuperClass.specStore.put(CreatePlanConsts.BASELINE_DETAILS, baselineDetails);
+        return baselineDetails;
     }
 }

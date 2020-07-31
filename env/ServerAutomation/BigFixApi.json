@@ -10,7 +10,7 @@
       "importFixlet": "api/import/{siteType}/{siteName}",
       "createBaselines":"api/baselines/{siteType}/{siteName}",
       "createTasks" : "api/tasks/{siteType}/{siteName}",
-      "listOfFixlets": "api/fixlets/{siteType}/{siteName}",
+      "fixletList": "api/fixlets/{siteType}/{siteName}",
       "deletePlan": "api/fixlet/master/{fixletID}"
     },
     "siteType": {

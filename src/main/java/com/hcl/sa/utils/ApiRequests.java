@@ -7,8 +7,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-import java.util.HashMap;
-
 import static io.restassured.RestAssured.given;
 
 public class ApiRequests {
@@ -22,7 +20,7 @@ public class ApiRequests {
     }
 
     public RequestSpecification setWasLibertyURIAndBasicAuthentication() {
-        RestAssured.baseURI = CreatePlanConsts.WASLIBERTY_SERVER_URI.text;
+        RestAssured.baseURI = CreatePlanConsts.WAS_LIBERTY_SERVER_URI.text;
         RestAssured.useRelaxedHTTPSValidation();
         Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());
         RequestSpecification bigfixCredentials = given().auth().preemptive().basic(consoleCred.getUsername(), consoleCred.getPassword());

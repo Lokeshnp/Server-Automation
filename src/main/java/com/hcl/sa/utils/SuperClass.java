@@ -82,8 +82,18 @@ public class SuperClass {
 
     public void killWinAppDriver(){
         try {
-            getInstance().getRunTime().exec("taskkill /f /im WinAppDriver.exe");
-            getInstance().getRunTime().exec("taskkill /f /im cmd.exe");
+            getInstance().getRunTime().exec(WinAppConsts.CLOSE_WINAPP_EXE.value);
+            logger.info("Win app driver server is stopped");
+            closeCmd();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeCmd(){
+        try {
+            getInstance().getRunTime().exec(WinAppConsts.CLOSE_CMD.value);
+            logger.info("Command Prompt is closed");
         } catch (IOException e) {
             e.printStackTrace();
         }

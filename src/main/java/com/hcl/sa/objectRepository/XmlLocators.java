@@ -12,4 +12,6 @@ public interface XmlLocators {
     String BASELINE_ID_XPATH = "//ID/text()";
     String TASK_ID_XPATH = "//Task/ID/text()";
     String STATUS = "//Status/text()";
+    String COMPUTER_NAME = "//Computer/Property[@Name ='Computer Name']/text()";
+
 }

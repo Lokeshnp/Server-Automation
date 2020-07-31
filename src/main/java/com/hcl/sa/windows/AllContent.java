@@ -58,7 +58,6 @@ public class AllContent {
         int saIndex = 0;
         int colIndex = getColumnIndexOfExtSitesWin(WinAppConsts.ATTR_NAME.value);
         String externalSites = AllContentsLocators.external_sites_xpath.replace("colIndex",String.valueOf(colIndex));
-        System.out.println("exteral Sites xpath="+externalSites);
         List<WebElement> externalSitesList = winActions.findElementsByXpath(externalSites);
         logger.debug("External Sites List size=" + externalSitesList.size());
         for (int i = 0; i < externalSitesList.size(); i++) {

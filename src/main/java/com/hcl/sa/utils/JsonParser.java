@@ -62,19 +62,19 @@ public class JsonParser {
     }
 
     public JsonObject getPlanConsoleApiObject() {
-        return consoleObj.getAsJsonObject().get(CreatePlanConsts.WASLIBERTY_API_URI.text).getAsJsonObject();
+        return consoleObj.getAsJsonObject().get(CreatePlanConsts.WAS_LIBERTY_API_URI.text).getAsJsonObject();
     }
 
     public String getUriToFetchPlanXml(JsonObject jsonObject) {
         return jsonObject.get(CreatePlanConsts.PLAN_EXECUTION_TEMPLATE.text).getAsString();
     }
 
-    public String getUriToInitiatePlanExecutionAction(JsonObject jsonObject) {
+    public String getUriToTakeActionOnPlan(JsonObject jsonObject) {
         return jsonObject.get(CreatePlanConsts.EXECUTE_PLAN.text).getAsString();
     }
 
     public String getUriToFetchListOfFixlets(JsonObject jsonObject) {
-        return jsonObject.get(ConsoleConsts.LIST_OF_FIXLETS.text).getAsString();
+        return jsonObject.get(ConsoleConsts.FIXLET_LIST.text).getAsString();
     }
 
     public String getUriToDeletePlan(JsonObject jsonObject) {
