@@ -20,7 +20,8 @@
       "serverAutomation": "Server Automation",
       "Abhinav":"Abhinav",
       "Pooja":"Pooja",
-      "master": "master"
+      "master": "master",
+      "Lokesh": "Lokesh"
     },
     "wasLibertyApi" : {
       "planExecutionTemplate" : "serverautomation/plan/master/{planID}",

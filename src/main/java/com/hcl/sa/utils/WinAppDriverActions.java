@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-
 public class WinAppDriverActions {
 
 
@@ -116,6 +115,10 @@ public class WinAppDriverActions {
         act.doubleClick(wb).build().perform();
     }
 
+    public List<WebElement> findElementsByTagName(String tagName){
+        return  winDriver.findElementsByTagName(tagName);
+    }
+
     public void closeWindowApp() {
         winDriver.closeApp();
     }
@@ -141,6 +144,7 @@ public class WinAppDriverActions {
         act.release();
         return act;
     }
+
 
 
     public void waitForListVisibility(List<WebElement> list, int timeout) {
@@ -169,5 +173,7 @@ public class WinAppDriverActions {
         WebDriverWait wait = new WebDriverWait(winDriver, timeout);
         wait.until(ExpectedConditions.invisibilityOf(ele));
     }
+
+
 }
 

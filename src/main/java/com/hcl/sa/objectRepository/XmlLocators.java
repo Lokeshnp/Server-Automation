@@ -11,5 +11,6 @@ public interface XmlLocators {
     String FIXLET_ID_XPATH = "//Fixlet/ID/text()";
     String BASELINE_ID_XPATH = "//ID/text()";
     String STATUS = "//Status/text()";
+    String TASK_ID_XPATH = "//Task/ID/text()";
 
 }

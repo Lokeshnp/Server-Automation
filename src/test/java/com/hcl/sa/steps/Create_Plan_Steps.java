@@ -8,8 +8,6 @@ import com.hcl.sa.utils.ConsoleActions;
 import com.hcl.sa.utils.SuperClass;
 import com.hcl.sa.windows.AutomationPlans;
 import com.thoughtworks.gauge.Step;
-import com.thoughtworks.gauge.Table;
-import com.thoughtworks.gauge.TableRow;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 public class Create_Plan_Steps {
 
@@ -42,9 +39,10 @@ public class Create_Plan_Steps {
         RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
                 contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
                 pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text));
-        HashMap<String, String> fixletDetails = consoleActions.importFixlet("C:\\IntegrateCode\\sa-dashboard-automation\\src\\test\\resources\\PlanFixlets\\", requestSpecification);
+        HashMap<String, String> fixletDetails = consoleActions.importFixlet("C:\\Users\\bigfix\\sa-dashboard-automation\\src\\test" +
+                "\\resources\\PlanFixlets\\", requestSpecification);
         String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_FIXLETS_PLAN.text, fixletDetails);
-        SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
+        //SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
         SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, fixletDetails);
         logger.info("Created plan id : \n" + planID);
     }
@@ -78,7 +76,7 @@ public class Create_Plan_Steps {
         HashMap<String, String> fixletDetails = new HashMap<>();
         fixletDetails.put("Custom Baseline", baselinID);
         String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_BASELINE_PLAN.text, fixletDetails);
-        SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
+        //SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
         SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, fixletDetails);
     }
 
@@ -88,5 +86,31 @@ public class Create_Plan_Steps {
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);
         logger.info("Executed plan id : \n" + planID);
+    }
+
+    @Step("Then execute automation plan with a combination of baselines, fixlets and tasks on following OS")
+    public void executePlanWithCombinationOfBaselines_fixlets_tasks() throws TransformerException, SAXException, IOException {
+        String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
+        HashMap<String, String> fixlets_Details = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
+        automationPlans.executePlan(planID, fixlets_Details);
+        logger.info("Executed plan id : \n" + planID);
+    }
+
+    @Step("Create automation plan with a combination of baseline, fixlets and tasks on following OS")
+    public void createPlanWithCombinationOfBaseline_fixlets_tasks() throws IOException, SAXException, TransformerException {
+        //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA
+        HashMap<String, String> fixlets_Details=new HashMap<>();
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
+                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.LOKESH.text));
+        fixlets_Details = consoleActions.importFixlet("C:\\Users\\bigfix\\sa-dashboard-automation\\src\\test" +
+              "\\resources\\PlanFixlets\\", requestSpecification);
+        HashMap<String, String> taskDetails = consoleActions.importTask("C:\\Users\\bigfix\\sa-dashboard-automation\\src\\test" +
+              "\\resources\\PlanTasks\\", requestSpecification);
+        fixlets_Details.putAll(taskDetails);
+        String baselinID = consoleActions.createBaseline(ConsoleConsts.CUSTOM.text, ConsoleConsts.LOKESH.text);
+        fixlets_Details.put("Custom Baseline", baselinID);
+        String planID = automationPlans.createPlan(CreatePlanConsts.PLAN_WITH_COMBINATION_OF_FIXLETS_TASKS_BASELINE.text, fixlets_Details);
+        SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, fixlets_Details);
     }
 }

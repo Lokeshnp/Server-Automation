@@ -10,8 +10,9 @@ public enum ConsoleConsts {
     ACTION_STATUS("actionStatus"), STOP_ACTION("stopAction"), ACTION_ID("actionID"), COMPUTER_ID_REGEX("computer/\\d+"), DELETE_ACTION("deleteAction"),
     SITE_TYPE("siteType"), SITE_NAME("siteName"), EXTERNAL("external"), SERVER_AUTOMATION("serverAutomation"), CONSOLE_EXE_PATH(System.getenv("console_exe_path")),
     IMPORT_FIXLET("importFixlet"),BASELINE_FIXLETS_FOLDER(System.getenv("baseline_fixlets_folder_path")),CUSTOM("custom"),ABHINAV("Abhinav"),CREATE_BASELINE("createBaselines"),
-    CREATE_BASELINE_PAYLOAD_PATH(System.getenv("create_baseline_payload_path")),FIXLET_ID_LIST,CUSTOM_SITE("CustomSite"), POOJA("Pooja"),
-    FILTER_ID("ID"), LIST_OF_FIXLETS("listOfFixlets"), ACTION("Action"), DELETE_PLAN("deletePlan"), MASTER("master");
+    CREATE_BASELINE_PAYLOAD_PATH(System.getenv("create_baseline_payload_path")),FIXLET_ID_LIST,TASK_ID_LIST,CUSTOM_SITE("CustomSite"), POOJA("Pooja"),
+    LOKESH("Lokesh"),
+    FILTER_ID("ID"), LIST_OF_FIXLETS("listOfFixlets"), ACTION("Action"), DELETE_PLAN("deletePlan"), MASTER("master"), SERVER_99_COMP_NAME("DESKTOP-BGKFMS5");
 
     public String text;
 

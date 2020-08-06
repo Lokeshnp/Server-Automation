@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class Before {
 
-    private Logger logger = LogManager.getLogger(Before.class);
+    private final Logger logger = LogManager.getLogger(Before.class);
     ConsoleActions consoleActions = new ConsoleActions();
 
 

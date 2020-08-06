@@ -10,7 +10,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public class WinAppDriverCaps {
 
     private static DesiredCapabilities caps;
-    private static  Logger logger = LogManager.getLogger(WinAppDriverCaps.class);
+    private static final Logger logger = LogManager.getLogger(WinAppDriverCaps.class);
 
     private WinAppDriverCaps(){
     }

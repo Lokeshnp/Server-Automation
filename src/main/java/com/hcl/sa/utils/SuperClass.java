@@ -22,7 +22,7 @@ public class SuperClass {
     private volatile  static SuperClass obj;
     private JsonElement jsonElement = null;
     public static DataStore specStore = DataStoreFactory.getSpecDataStore();
-    private Logger logger = LogManager.getLogger(com.hcl.sa.utils.SuperClass.class);
+    private final Logger logger = LogManager.getLogger(com.hcl.sa.utils.SuperClass.class);
     private Runtime runtime = null;
     private static Process process = null;
     private volatile WindowsDriver<WebElement> windowsDriver = null;
@@ -83,7 +83,7 @@ public class SuperClass {
     public void killWinAppDriver(){
         try {
             getInstance().getRunTime().exec("taskkill /f /im WinAppDriver.exe");
-            getInstance().getRunTime().exec("taskkill /f /im cmd.exe");
+            getInstance().getRunTime().exec("taskkill /im cmd.exe");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -10,24 +10,17 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class ConsoleActions implements XmlLocators {
@@ -172,23 +165,23 @@ public class ConsoleActions implements XmlLocators {
         do {
             Response response = getActionStatus(actionID);
             status = xmlParser.getElementOfXmlByXpath(response.asInputStream(), COMPUTER_STATUS_XPATH).get(0);
-            isSuccessful = (status.toString().contains("successful"));
-            isRestart = (status.toString().contains("restart"));
-            isFailed = (status.toString().contains("failed"));
+            isSuccessful = (status.contains("successful"));
+            isRestart = (status.contains("restart"));
+            isFailed = (status.contains("failed"));
         } while (!(isSuccessful || isRestart || isFailed));
         logger.debug("Action Status = " + status);
         return status;
     }
 
     public void verifyActionStatus(String fixletID, String actionID, String actionStatus, String targetVmIpAddress) {
-        if (actionStatus.toString().contains(ConsoleConsts.SUCCESSFUL.text)) {
+        if (actionStatus.contains(ConsoleConsts.SUCCESSFUL.text)) {
             stopAction(actionID);
             logger.debug("Stopped an Action for the fixlet ID " + fixletID + " with action ID " + actionID);
         }
-        if (actionStatus.toString().contains(ConsoleConsts.RESTART.text)) {
+        if (actionStatus.contains(ConsoleConsts.RESTART.text)) {
             logger.debug("Restart the target machine " + targetVmIpAddress + " for the fixlet ID " + fixletID + " with action ID " + actionID);
         }
-        if (actionStatus.toString().contains(ConsoleConsts.FAILED.text)) {
+        if (actionStatus.contains(ConsoleConsts.FAILED.text)) {
             logger.debug("Fixlet ID " + fixletID + " with action ID " + actionID + " got failed");
         }
     }
@@ -199,7 +192,8 @@ public class ConsoleActions implements XmlLocators {
         logger.debug("Response after deleting the action = " + response.asString());
     }
 
-    public HashMap<String, String> importFixlet(String folderPath, RequestSpecification requestSpecification) throws IOException, SAXException {
+    public HashMap<String, String> importFixlet(String folderPath, RequestSpecification requestSpecification)
+            throws IOException, SAXException {
         HashMap<String, String> fixletID = new HashMap<>();
         File[] files = new File(folderPath).listFiles();
         for (File file : files) {
@@ -234,5 +228,24 @@ public class ConsoleActions implements XmlLocators {
         Response response = apiRequests.POST(requestSpecification, uri, body);
         logger.debug("Create baseline API response=" + response.asString());
         return xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.BASELINE_ID_XPATH).get(0);
+    }
+    public HashMap<String, String> importTask(String folderPath, RequestSpecification requestSpecification)
+            throws IOException, SAXException {
+        HashMap<String, String> taskID = new HashMap<>();
+        File[] files = new File(folderPath).listFiles();
+        for (File file : files) {
+            if (file.isFile()) {
+                String fileName = file.getName();
+                String apiRequestBody = commonFunctions.readTextFile(folderPath + fileName).toString();
+                String uri = jsonParser.getUriToImportFixlet(jsonParser.getConsoleApiObject());
+                Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
+                logger.debug("API request Response after importing the task into custom site =/n" + response.asString());
+                logger.info("Task got imported to the site " + siteName);
+                taskID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.TASK_ID_XPATH).get(0));
+            }
+        }
+        logger.debug("Imported Fixlet details=" + taskID);
+        SuperClass.specStore.put(ConsoleConsts.TASK_ID_LIST, taskID);
+        return taskID;
     }
 }

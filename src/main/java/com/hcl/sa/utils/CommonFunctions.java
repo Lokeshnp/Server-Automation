@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 public class CommonFunctions {
 
-    private Logger logger = LogManager.getLogger(ConsoleActions.class);
+    private final Logger logger = LogManager.getLogger(ConsoleActions.class);
     JsonParser jsonParser = new JsonParser();
 
     public String filterData(String regEx, String source) {
