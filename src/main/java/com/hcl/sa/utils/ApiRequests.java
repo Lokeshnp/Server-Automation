@@ -1,13 +1,11 @@
 package com.hcl.sa.utils;
 
 import com.hcl.sa.constants.ConsoleConsts;
-import com.hcl.sa.constants.CreatePlanConsts;
+import com.hcl.sa.constants.Credentials;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-
-import java.util.HashMap;
 
 import static io.restassured.RestAssured.given;
 
@@ -15,14 +13,6 @@ public class ApiRequests {
 
     public RequestSpecification setBaseURIAndBasicAuthentication() {
         RestAssured.baseURI = ConsoleConsts.BIGFIX_SERVER_URI.text;
-        RestAssured.useRelaxedHTTPSValidation();
-        Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());
-        RequestSpecification bigfixCredentials = given().auth().preemptive().basic(consoleCred.getUsername(), consoleCred.getPassword());
-        return bigfixCredentials;
-    }
-
-    public RequestSpecification setWasLibertyURIAndBasicAuthentication() {
-        RestAssured.baseURI = CreatePlanConsts.WASLIBERTY_SERVER_URI.text;
         RestAssured.useRelaxedHTTPSValidation();
         Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());
         RequestSpecification bigfixCredentials = given().auth().preemptive().basic(consoleCred.getUsername(), consoleCred.getPassword());
@@ -61,16 +51,6 @@ public class ApiRequests {
         return response;
     }
 
-    public Response POST(RequestSpecification reqSpecs, String uri) {
-        Response response = checkForStatusCode(reqSpecs.when().post(uri));
-        return response;
-    }
-
-    public Response POST(RequestSpecification reqSpecs, String uri, String body) {
-        Response response = checkForStatusCode(reqSpecs.and().body(body).when().post(uri));
-        return response;
-    }
-
     public Response checkForStatusCode(Response res) {
         return res.then().assertThat().statusCode(200).extract().response();
     }
@@ -78,11 +58,6 @@ public class ApiRequests {
     public Response DELETE(String param, String paramValue, String uri) {
         Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().contentType(ContentType.JSON).and().
                 pathParam(param, paramValue).and().when().delete(uri));
-        return response;
-    }
-
-    public Response DELETE(RequestSpecification reqSpecs, String uri) {
-        Response response = checkForStatusCode(reqSpecs.and().when().delete(uri));
         return response;
     }
 

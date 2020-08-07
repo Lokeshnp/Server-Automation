@@ -1,1 +1,1 @@
-var index = {"Tags":{},"Specs":{"User should be able to create \u0026 excute Plan with multiple fixlets/tasks/baselines/clients. In order to execute, Plan engine should be up \u0026 running":["specs/CreatePlan.html"]}};
+var index = {"Tags":{"config":["specs/PlanEngine.html"]},"Specs":{"This Task installs or upgrades the Automation Plan Engine and (re)starts it automatically":["specs/PlanEngine.html"]}};
