@@ -13,7 +13,7 @@ public class FixletDetails {
         private String SiteType;
         private String FixletID;
 
-        private final Logger logger = LogManager.getLogger(FixletDetails.class);
+        private Logger logger = LogManager.getLogger(FixletDetails.class);
 
         public Builder setSiteName(String siteName) {
             SiteName = siteName;
