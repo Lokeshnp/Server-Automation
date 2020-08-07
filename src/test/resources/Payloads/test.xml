@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
+<Baseline Resource="https://10.134.130.26:52311/api/baseline/custom/Abhinav/4505" LastModified="Tue, 30 Jun 2020 23:59:32 +0000">
+<Name>Custom Baseline</Name>
+<ID>4505</ID>
+</Baseline>
+</BESAPI>

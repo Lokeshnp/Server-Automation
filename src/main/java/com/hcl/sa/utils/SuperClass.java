@@ -1,21 +1,32 @@
 package com.hcl.sa.utils;
 
+import com.hcl.sa.capabilities.WinAppDriverCaps;
+import com.hcl.sa.constants.WinAppConsts;
 import com.thoughtworks.gauge.datastore.DataStore;
 import com.thoughtworks.gauge.datastore.DataStoreFactory;
+import io.appium.java_client.windows.WindowsDriver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.openqa.selenium.WebElement;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class SuperClass {
 
     private volatile  static SuperClass obj;
     private JsonElement jsonElement = null;
     public static DataStore specStore = DataStoreFactory.getSpecDataStore();
+    private final Logger logger = LogManager.getLogger(com.hcl.sa.utils.SuperClass.class);
+    private Runtime runtime = null;
+    private static Process process = null;
+    private volatile WindowsDriver<WebElement> windowsDriver = null;
 
-    private Logger logger = LogManager.getLogger(com.hcl.sa.utils.SuperClass.class);
 
     private SuperClass() {
     }
@@ -43,5 +54,38 @@ public class SuperClass {
             e.printStackTrace();
         }
         return jsonElement;
+    }
+
+    public WindowsDriver<WebElement> getWinAppDriver(String exePath) {
+        if (windowsDriver == null){
+            try {
+                startWinAppDriver();
+                windowsDriver = new WindowsDriver<WebElement>(new URL(WinAppConsts.WIN_APP_DRIVER_REMOTE_SERVER_URL.value), WinAppDriverCaps.getCapabilities(exePath));
+                windowsDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return windowsDriver;
+    }
+
+    public static Process startWinAppDriver()throws IOException, InterruptedException {
+        String cmd = WinAppConsts.WINAPP_DRIVER_INVOKE_CMD.value;
+        process =  getInstance().getRunTime().exec(cmd);
+        return process;
+    }
+
+    public Runtime getRunTime(){
+        runtime = Runtime.getRuntime();
+        return runtime;
+    }
+
+    public void killWinAppDriver(){
+        try {
+            getInstance().getRunTime().exec("taskkill /f /im WinAppDriver.exe");
+            getInstance().getRunTime().exec("taskkill /im cmd.exe");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

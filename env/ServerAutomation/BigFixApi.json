@@ -1,0 +1,31 @@
+{
+  "bigfixApi": {
+    "consoleApi": {
+      "relevantComputers": "api/fixlet/{siteType}/{siteName}/{fixletID}/computers",
+      "initiateAction": "api/actions",
+      "actionStatus": "api/action/{actionID}/status",
+      "stopAction": "api/action/{actionID}/stop",
+      "compProperties": "api/computer/{computerID}",
+      "deleteAction": "/api/action/{actionID}",
+      "importFixlet": "api/import/{siteType}/{siteName}",
+      "createBaselines":"api/baselines/{siteType}/{siteName}",
+      "listOfFixlets": "api/fixlets/{siteType}/{siteName}",
+      "deletePlan": "api/fixlet/master/{fixletID}"
+    },
+    "siteType": {
+      "external": "external",
+      "custom": "custom"
+    },
+    "siteName": {
+      "serverAutomation": "Server Automation",
+      "Abhinav":"Abhinav",
+      "Pooja":"Pooja",
+      "master": "master",
+      "Lokesh": "Lokesh"
+    },
+    "wasLibertyApi" : {
+      "planExecutionTemplate" : "serverautomation/plan/master/{planID}",
+      "executePlan" : "serverautomation/plan/master/{planID}"
+    }
+  }
+}

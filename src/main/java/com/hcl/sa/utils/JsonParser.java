@@ -3,12 +3,18 @@ package com.hcl.sa.utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
+import com.hcl.sa.constants.CreatePlanConsts;
+import com.hcl.sa.constants.VsphereConsts;
 
 public class JsonParser {
-    JsonElement consoleObj = SuperClass.getInstance().getJsonParser(ConsoleConsts.CONSOLE_API_JSON_PATH.text).getAsJsonObject().get(ConsoleConsts.CONSOLE.text);
-
+    JsonElement consoleObj = SuperClass.getInstance().getJsonParser(CommonFunctions.getPath(ConsoleConsts.BIGFIX_API_JSON_PATH.text)).getAsJsonObject().get(ConsoleConsts.BIGFIX_API.text);
+    JsonElement vmObj = SuperClass.getInstance().getJsonParser(CommonFunctions.getPath(VsphereConsts.VM_DETAILS_JSON_PATH.text)).getAsJsonObject().get(VsphereConsts.VIRTUAL_MACHINE_JSON_OBJ.text);
     public JsonObject getConsoleApiObject() {
         return consoleObj.getAsJsonObject().get(ConsoleConsts.CONSOLE_API.text).getAsJsonObject();
+    }
+
+    public JsonObject getBaselineFixletObj(){
+            return  vmObj.getAsJsonObject().get(VsphereConsts.BASELINE_FIXLETS.text).getAsJsonObject();
     }
 
     public String getUriToDeleteAction(JsonObject jsonObject) {
@@ -42,4 +48,33 @@ public class JsonParser {
     public JsonObject getSiteNameObject() {
         return consoleObj.getAsJsonObject().get(ConsoleConsts.SITE_NAME.text).getAsJsonObject();
     }
+
+    public String getUriToImportFixlet(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.IMPORT_FIXLET.text).getAsString();
+    }
+
+    public String getUriToCreateBaseline(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.CREATE_BASELINE.text).getAsString();
+    }
+
+    public JsonObject getPlanConsoleApiObject() {
+        return consoleObj.getAsJsonObject().get(CreatePlanConsts.WASLIBERTY_API_URI.text).getAsJsonObject();
+    }
+
+    public String getUriToFetchPlanXml(JsonObject jsonObject) {
+        return jsonObject.get(CreatePlanConsts.PLAN_EXECUTION_TEMPLATE.text).getAsString();
+    }
+
+    public String getUriToInitiatePlanExecutionAction(JsonObject jsonObject) {
+        return jsonObject.get(CreatePlanConsts.EXECUTE_PLAN.text).getAsString();
+    }
+
+    public String getUriToFetchListOfFixlets(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.LIST_OF_FIXLETS.text).getAsString();
+    }
+
+    public String getUriToDeletePlan(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.DELETE_PLAN.text).getAsString();
+    }
 }
+
