@@ -56,6 +56,7 @@ public class Payload {
 
     public String createAction(FileInputStream fis, HashMap<String, String> params, String computerID) throws TransformerException {
         Document doc = xmlParser.buildDocument(fis);
+        //Tags in the xml are not proper format so hard coding the tagname of the xml
         doc.getElementsByTagName("Sitename").item(0).setTextContent(params.get(ConsoleConsts.SITE_NAME.text));
         doc.getElementsByTagName("FixletID").item(0).setTextContent(params.get(ConsoleConsts.FIXLET_ID.text));
         doc.getElementsByTagName("ComputerID").item(0).setTextContent(computerID);

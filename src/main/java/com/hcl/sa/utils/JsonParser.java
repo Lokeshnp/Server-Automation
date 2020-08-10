@@ -65,6 +65,10 @@ public class JsonParser {
         return consoleObj.getAsJsonObject().get(CreatePlanConsts.WAS_LIBERTY_API_URI.text).getAsJsonObject();
     }
 
+    public JsonObject getSaRestPlanConsoleApiObject() {
+        return consoleObj.getAsJsonObject().get(CreatePlanConsts.SA_REST_API_URI.text).getAsJsonObject();
+    }
+
     public String getUriToFetchPlanXml(JsonObject jsonObject) {
         return jsonObject.get(CreatePlanConsts.PLAN_EXECUTION_TEMPLATE.text).getAsString();
     }

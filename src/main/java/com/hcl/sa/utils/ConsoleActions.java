@@ -55,12 +55,12 @@ public class ConsoleActions implements XmlLocators {
         return compIDsList;
     }
 
-    public Integer waitUntilApplicableCompsVisible(String fixletID) throws IOException, SAXException, ParserConfigurationException {
+    public Integer waitUntilApplicableCompsVisible(HashMap<String, String> params) throws IOException, SAXException, ParserConfigurationException {
         int computerTagCount;
         long startTime = System.currentTimeMillis();
         boolean waitUntillApplicableCompsDisp = true;
         do {
-            Response relevantMachines = getRelevantComputers(commonFunctions.defaultSiteDetails(fixletID));
+            Response relevantMachines = getRelevantComputers(params);
             computerTagCount = xmlParser.getElementsByTagName(relevantMachines.asInputStream(), XMLConsts.COMPUTER_TAGNAME.text).getLength();
             waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
             if (!waitUntillApplicableCompsDisp) {
@@ -95,21 +95,6 @@ public class ConsoleActions implements XmlLocators {
     }
 
     public Response initiateAction(String actionBody) {
-        /*//TODO, need to change the below method of passing string to create a new xml file
-        String actionBody = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
-                "<BES xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"BES.xsd\">\r\n" +
-                " <SourcedFixletAction>\r\n" +
-                "   <SourceFixlet>\r\n" +
-                "     <Sitename>" + siteName + "</Sitename>\r\n" +
-                "     <FixletID>" + fixletID + "</FixletID>\r\n" +
-                "     <Action>Action1</Action>\r\n" +
-                "   </SourceFixlet>\r\n" +
-                "   <Target>\r\n" +
-                "     <ComputerID>" + computerID + "</ComputerID>\r\n" +
-                "   </Target>\r\n" +
-                "  <Parameter Name=\"_BESClient_EMsg_Detail\">1000</Parameter>\r\n" +
-                " </SourcedFixletAction>\r\n" +
-                "</BES>";*/
         Response response = apiRequests.POST(actionBody, jsonParser.getUriToInitiateAction(consoleApiObject));
         logger.debug("Response after initiating the action: \n" + response.asString());
         return response;
@@ -125,7 +110,7 @@ public class ConsoleActions implements XmlLocators {
         Response response = null;
         String targetVmIpAddress = commonFunctions.getIpAddress(ConsoleConsts.BIGFIX_SERVER_URI.text);
         String computerID = getApplicableComputerID(params, targetVmIpAddress);
-        Integer computerTagCount = waitUntilApplicableCompsVisible(params.get(ConsoleConsts.FIXLET_ID.text));
+        Integer computerTagCount = waitUntilApplicableCompsVisible(params);
         String actionID = null;
         if (computerTagCount == 1) {
             String initiateActionPayloadPath = CommonFunctions.getPath(ConsoleConsts.INITIATE_ACTION_PAYLOAD_PATH.text);
@@ -293,17 +278,16 @@ public class ConsoleActions implements XmlLocators {
                     String uri = jsonParser.getUriToImportFixlet(jsonParser.getConsoleApiObject());
                     Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
                     logger.debug("API request Response after importing the fixlet into custom site =/n" + response.asString());
-                    logger.info("Fixlet got imported to the site " + siteName);
                     FixletAndTaskID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.FIXLET_ID_XPATH).get(0));
                 } else if (type == "Task") {
                     String uri = jsonParser.getUriToCreateTask(jsonParser.getConsoleApiObject());
                     Response response = apiRequests.POST(requestSpecification, uri, apiRequestBody);
-                    logger.debug("API request Response after creating the task into custom site =/n" + response.asString());
-                    logger.info("Tasks got imported to the site " + siteName);
+                    logger.debug("API request Response after importing the fixlet into custom site =/n" + response.asString());
                     FixletAndTaskID.put(fileName, xmlParser.getElementOfXmlByXpath(response.asInputStream(), XmlLocators.TASK_ID_XPATH).get(0));
                 }
             }
         }
+        logger.info("Fixlet got imported to the site " + siteName);
         logger.debug("Imported Fixlet and Task details=" + FixletAndTaskID);
         SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, FixletAndTaskID);
         return FixletAndTaskID;

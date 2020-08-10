@@ -9,16 +9,27 @@ import com.hcl.sa.utils.SuperClass;
 import com.hcl.sa.windows.AutomationPlans;
 import com.thoughtworks.gauge.Step;
 import com.thoughtworks.gauge.Table;
+import groovy.json.JsonOutput;
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.internal.common.classpath.ClassPathResolver;
+import io.restassured.matcher.RestAssuredMatchers;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.apache.groovy.json.internal.Exceptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Create_Plan_Steps {
 
@@ -155,5 +166,35 @@ public class Create_Plan_Steps {
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.BASELINE_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);
         logger.info("Executed plan id : \n" + planID);
+    }
+
+    @Step("Verify the automation plan(fixlet) Get API with external site automation plan ID")
+    public void verifyPlanWithExternalSite() throws IOException, SAXException {
+        List<String> plans = automationPlans.listOfPlans(commonFunctions.commonParams(ConsoleConsts.EXTERNAL.text, ConsoleConsts.SERVER_AUTOMATION.text));
+        for (int i = 0; i < plans.size(); i++) {
+            RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                    and().pathParams(commonFunctions.saRestCommonParams(ConsoleConsts.EXTERNAL.text, ConsoleConsts.SERVER_AUTOMATION.text, plans.get(i)));
+            Response response = automationPlans.getPlanXml(requestSpecification);
+            response.then().statusCode(200);
+        }
+    }
+
+    @Step("Create automation plan with custom site fixlets on following OS <table>")
+    public void createPlanWithCustomSite(Table table) throws IOException, SAXException {
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
+                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text));
+        HashMap<String, String> fixletDetails = consoleActions.importFixlet(CommonFunctions.getPath(ConsoleConsts.FIXLETS_FOLDER.text), requestSpecification);
+        String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_FIXLETS_PLAN.text, fixletDetails, ConsoleConsts.POOJA.text);
+        logger.info("Created plan id : \n" + planID);
+    }
+
+    @Step("Verify the automation plan(fixlet) Get API with custom site automation plan ID")
+    public void verifyPlanWithCustomSite() throws IOException, SAXException {
+        String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(commonFunctions.saRestCommonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, planID));
+        Response response = automationPlans.getPlanXml(requestSpecification);
+        response.then().statusCode(200);
     }
 }

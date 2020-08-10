@@ -26,6 +26,10 @@
     "wasLibertyApi" : {
       "planExecutionTemplate" : "serverautomation/plan/master/{planID}",
       "executePlan" : "serverautomation/plan/master/{planID}"
+    },
+    "saRestApi" : {
+      "planExecutionTemplate" : "serverautomation/plan/{siteType}/{siteName}/{planID}",
+      "executePlan" : "serverautomation/plan/{siteType}/{siteName}/{planID}"
     }
   }
 }

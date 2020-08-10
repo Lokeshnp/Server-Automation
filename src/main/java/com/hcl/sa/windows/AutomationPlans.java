@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.hcl.sa.constants.*;
 import com.hcl.sa.objectRepository.AutomationPlanLocators;
 import com.hcl.sa.utils.*;
+import com.sun.org.apache.xerces.internal.xni.XMLLocator;
 import io.appium.java_client.windows.WindowsDriver;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -36,6 +37,7 @@ public class AutomationPlans implements AutomationPlanLocators {
     JsonParser jsonParser = new JsonParser();
     XMLParser xmlParser = new XMLParser();
     JsonObject planConsoleApiObject = jsonParser.getPlanConsoleApiObject();
+    JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
     ConsoleActions consoleActions = new ConsoleActions();
     CommonFunctions commonFunctions = new CommonFunctions();
@@ -52,6 +54,13 @@ public class AutomationPlans implements AutomationPlanLocators {
         WebElement nameField = winActions.findElementByAccessibilityId(name_field_using_accessbilityID);
         nameField.sendKeys(planName);
         logger.info("Plan name entered");
+    }
+
+    public void selectSiteName(String siteName) {
+        WebElement comboBox = winActions.findElementByName(ConsoleConsts.MASTER_ACTION_SITE.text);
+        comboBox.click();
+        winActions.findElementByName(siteName).click();
+        logger.info("selected site name clicked");
     }
 
     public void clickAddStepBtn() {
@@ -147,11 +156,34 @@ public class AutomationPlans implements AutomationPlanLocators {
         return planID;
     }
 
+    public String createPlan(String planName, HashMap<String, String> fixletDetails, String siteName) {
+        logger.info("Plan creation in progress...");
+        clickCreateBtn();
+        enterPlanName(planName);
+        selectSiteName(siteName);
+        for (Map.Entry<String, String> fixletDetail : fixletDetails.entrySet()) {
+            clickAddStepBtn();
+            String fixletName = fixletDetail.getKey().split(".bes")[0].trim();
+            addStepToPlan(fixletDetail.getValue(), fixletName);
+        }
+        savePlan();
+        String planID = getPlanID(planName);
+        SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
+        logger.info("Plan Created");
+        return planID;
+    }
+
     public Response getPlanXml(String planID) {
         String uri = jsonParser.getUriToFetchPlanXml(planConsoleApiObject);
         HashMap<String, String> params = new HashMap<>();
         params.put(CreatePlanConsts.PLAN_ID.text, planID);
         RequestSpecification requestSpecification = apiRequests.setWasLibertyURIAndBasicAuthentication().and().pathParams(params);
+        Response response = apiRequests.GET(requestSpecification, uri);
+        return response;
+    }
+
+    public Response getPlanXml(RequestSpecification requestSpecification) {
+        String uri = jsonParser.getUriToFetchPlanXml(saRestConsoleApiObject);
         Response response = apiRequests.GET(requestSpecification, uri);
         return response;
     }
@@ -252,5 +284,14 @@ public class AutomationPlans implements AutomationPlanLocators {
         String uri = jsonParser.getUriToDeletePlan(consoleApiObject);
         Response response = apiRequests.DELETE(ConsoleConsts.FIXLET_ID.text, fixletID, uri);
         logger.debug("Response after deleting the plan = " + response.asString());
+    }
+
+    public List<String> listOfPlans(HashMap<String, String> params) throws IOException, SAXException {
+        List<String> planList = new ArrayList<String>();
+        String uri = jsonParser.getUriToFetchListOfFixlets(consoleApiObject);
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().and().pathParams(params);
+        Response response = apiRequests.GET(requestSpecification, uri);
+        planList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), consoleActions.PLAN_NAME_XPATH);
+        return planList;
     }
 }

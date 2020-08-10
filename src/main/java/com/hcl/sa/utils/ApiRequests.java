@@ -27,6 +27,14 @@ public class ApiRequests {
         return bigfixCredentials;
     }
 
+    public RequestSpecification setSaRestURIAndBasicAuthentication() {
+        RestAssured.baseURI = CreatePlanConsts.SA_REST_SERVER_URI.text;
+        RestAssured.useRelaxedHTTPSValidation();
+        Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());
+        RequestSpecification bigfixCredentials = given().auth().preemptive().basic(consoleCred.getUsername(), consoleCred.getPassword());
+        return bigfixCredentials;
+    }
+
     public Response GET(String uri) {
         Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().get(uri));
         return response;

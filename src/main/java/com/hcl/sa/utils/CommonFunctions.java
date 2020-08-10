@@ -1,6 +1,7 @@
 package com.hcl.sa.utils;
 
 import com.hcl.sa.constants.ConsoleConsts;
+import com.hcl.sa.constants.CreatePlanConsts;
 import com.hcl.sa.constants.TimeOutConsts;
 import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.apache.commons.lang.StringUtils;
@@ -72,6 +73,15 @@ public class CommonFunctions {
         commonPara.put(ConsoleConsts.SITE_TYPE.text, jsonParser.getSiteTypeObject().get(siteType).getAsString());
         commonPara.put(ConsoleConsts.SITE_NAME.text, jsonParser.getSiteNameObject().get(siteName).getAsString());
         commonPara.put(ConsoleConsts.FIXLET_ID.text, fixletID);
+        logger.debug("Common Params=" + commonPara);
+        return commonPara;
+    }
+
+    public HashMap<String, String> saRestCommonParams(String siteType, String siteName, String planID) {
+        HashMap<String, String> commonPara = new HashMap<>();
+        commonPara.put(ConsoleConsts.SITE_TYPE.text, jsonParser.getSiteTypeObject().get(siteType).getAsString());
+        commonPara.put(ConsoleConsts.SITE_NAME.text, jsonParser.getSiteNameObject().get(siteName).getAsString());
+        commonPara.put(CreatePlanConsts.PLAN_ID.text, planID);
         logger.debug("Common Params=" + commonPara);
         return commonPara;
     }
