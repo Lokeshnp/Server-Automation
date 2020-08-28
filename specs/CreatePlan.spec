@@ -1,10 +1,5 @@
 # User should be able to create & excute Plan with multiple fixlets/tasks/baselines/clients. In order to execute, Plan engine should be up & running
 
-Login and Navigation
---------------------
-* Login to Bigfix console
-* Navigate to Automation Plan Dashboard
-
 Create & execute automation plan with multiple fixlets
 ---------------------------------------------------------
 tags:multipleFixlets
@@ -45,7 +40,6 @@ tags:multipleTasks
 |--------|
 |windows |
 |Linux   |
-//* Verify automation plan got created with multiple tasks in Plan Dashboard
 * Then execute automation plan with multiple tasks on following OS
 |OS Name |
 |--------|
@@ -62,7 +56,6 @@ tags:BaselineHavingMultipleTasks
 |--------|
 |windows |
 |Linux   |
-//* Verify automation plan got created with baseline having multiple tasks in Plan Dashboard
 * Then execute automation plan with baseline having multiple tasks on following OS
 |OS Name |
 |--------|
@@ -79,7 +72,6 @@ tags:multipleFixletsAndTasks
 |--------|
 |windows |
 |Linux   |
-//* Verify automation plan got created with multiple fixlets and tasks in Plan Dashboard
 * Then execute automation plan with multiple fixlets and tasks on following OS
 |OS Name |
 |--------|
@@ -96,7 +88,6 @@ tags:baselineHavingFixletsAndTasks
 |--------|
 |windows |
 |Linux   |
-//* Verify automation plan got created with baseline having fixlets and tasks in Plan Dashboard
 * Then execute automation plan with baseline having fixlets and tasks on following OS
 |OS Name |
 |--------|

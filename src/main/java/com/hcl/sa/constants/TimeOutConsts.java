@@ -3,7 +3,7 @@ package com.hcl.sa.constants;
 public enum TimeOutConsts {
 
 
-    WAIT_10_SECONDS(10),WAIT_1_SEC(1),WAIT_20_SECOND(20),WAIT_60_SECOND(60);
+    WAIT_10_SECONDS(10),WAIT_1_SEC(1),WAIT_20_SECOND(20),WAIT_60_SECOND(60), WAIT_3000_SEC(3000);
 
     public int seconds;
 

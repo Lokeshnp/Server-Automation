@@ -77,7 +77,7 @@ public class JsonParser {
         return jsonObject.get(CreatePlanConsts.EXECUTE_PLAN.text).getAsString();
     }
 
-    public String getUriToFetchListOfFixlets(JsonObject jsonObject) {
+    public String getUriToFetchFixletLIist(JsonObject jsonObject) {
         return jsonObject.get(ConsoleConsts.FIXLET_LIST.text).getAsString();
     }
 

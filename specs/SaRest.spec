@@ -1,15 +1,18 @@
-# User should be able to create & excute Plan with multiple fixlets/tasks/baselines/clients/sites.
+#User should be able to create & excute Plan with multiple fixlets/tasks/baselines/clients/sites.
 
 verify automation plan with external site
 -----------------------------------------
-* Verify the automation plan(fixlet) Get API with external site automation plan ID
+tags:external
+* When User sends SA-REST Get Api Request for the existing external site automation plan
+//* Then in response user should get http 200 status code
+//* And response body as plan definition xml template
+//* And user should validate the plan defination xml template
 
-Create & verify automation plan with custom site
---------------------------------------------------
+Verify SA-REST Get API works for custom site automation plan
+---------------------------------------------------------------------------------------
 tags:custom site
-* Create automation plan with custom site fixlets on following OS
-|OS Name |
-|--------|
-|windows |
-|Linux   |
-* Verify the automation plan(fixlet) Get API with custom site automation plan ID
+* User creates a custom site plan
+* And checks whether sa rest GET api works for it
+////* And gets response as http 200 status code
+////* And response body as plan defintion xml template
+////* And user validate whether plan definition xml template is proper or not

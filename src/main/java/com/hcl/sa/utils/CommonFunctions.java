@@ -52,7 +52,7 @@ public class CommonFunctions {
         return milliSeconds;
     }
 
-    public HashMap<String, String> defaultSiteDetails(String fixletID) {
+    public HashMap<String, String> setExternalSiteParams(String fixletID) {
         HashMap<String, String> commonPara = new HashMap<>();
         commonPara.put(ConsoleConsts.SITE_TYPE.text, jsonParser.getSiteTypeObject().get(ConsoleConsts.EXTERNAL.text).getAsString());
         commonPara.put(ConsoleConsts.SITE_NAME.text, jsonParser.getSiteNameObject().get(ConsoleConsts.SERVER_AUTOMATION.text).getAsString());

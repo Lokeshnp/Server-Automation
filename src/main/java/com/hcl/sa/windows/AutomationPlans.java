@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,13 +40,13 @@ public class AutomationPlans implements AutomationPlanLocators {
     JsonObject planConsoleApiObject = jsonParser.getPlanConsoleApiObject();
     JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
-    ConsoleActions consoleActions = new ConsoleActions();
     CommonFunctions commonFunctions = new CommonFunctions();
+    ConsoleActions consoleActions=new ConsoleActions();
 
 
     public void clickCreateBtn() {
         WebElement createBtn = winActions.winDriver.findElementByAccessibilityId(create_btn_access_id);
-        winActions.hardWait(3000); //js error on click of create button
+        winActions.hardWait(TimeOutConsts.WAIT_3000_SEC.seconds); //js error on click of create button
         winActions.waitForElementVisibilityAndClick(createBtn, TimeOutConsts.WAIT_10_SECONDS.seconds);
     }
 
@@ -73,22 +74,9 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     public void addStepToPlan(String fixletID, String fixletName) {
         searchUsingFilter(fixletID, fixletName);
-        //TODO REMOVE LATER IF BELOW CODE WORKS
-//        List<WebElement> result = winActions.findElementByName(fixletName);
-//        logger.debug("No of results="+result.size());
-//        Actions act = new Actions(winDriver);
-//        for(int i = 0 ; i < result.size() ; i ++){
-//            if(result.get(i).getAttribute(ConsoleConsts.LOCALIZED_CONTROL_TYPE.text).equalsIgnoreCase("item")){
-//                act.sendKeys(Keys.CONTROL).build().perform();
-//                result.get(i).click();
-//                winActions.hardWait(500);
-//                act.keyUp(Keys.CONTROL).build().perform();
-//            }
-//        }
         winActions.findElementByName(fixletName).click();
         winActions.pressKeyboardKey(1, Keys.TAB);
         winActions.pressKeyboardKey(1, Keys.ENTER);
-//        act.release().perform();
         logger.info("Step with name:" + fixletName + " is added to plan");
     }
 
@@ -100,9 +88,6 @@ public class AutomationPlans implements AutomationPlanLocators {
     }
 
     public void searchPlan(String planName) {
-        //TODO - Remove it later commented code
-        /*List<WebElement> editFields =winActions.findElementsByXpath(edit_field_using_xpath);
-        editFields.get(0).sendKeys(planName);*/
         WebElement searchPlanTextBox = winActions.findElementByAccessibilityId(search_plan_text_box_access_id);
         searchPlanTextBox.clear();
         searchPlanTextBox.sendKeys(planName);
@@ -189,32 +174,11 @@ public class AutomationPlans implements AutomationPlanLocators {
     }
 
     public void executePlan(String planID, HashMap<String, String> fixletDetails) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+        HashMap<String, String> params = new HashMap<>();
         Response response = getPlanXml(planID);
         logger.debug("Initiated the execute plan" + response.toString());
-        XMLParser xmlParser = new XMLParser();
-        Document doc = xmlParser.buildDocument(response.asInputStream());
-        NodeList nodes = doc.getElementsByTagName(XMLConsts.STEP.text);
-        Assert.assertEquals("step and fixlet details length is different", fixletDetails.size(), nodes.getLength());
-        int count = 0;
-        for (Map.Entry<String, String> map : fixletDetails.entrySet()) {
-            Node node = nodes.item(count);
-            Element element = (Element) node;
-            String fixletID = map.getValue();
-            Integer computerTagCount = waitUntilApplicableCompsVisible(fixletID);
-            String computerName = null;
-            if (computerTagCount == 1) {
-                computerName = getApplicableComputerName(fixletID);
-            }
-            Element targetElement = doc.createElement(XMLConsts.TARGET_SET.text);
-            Element computer = doc.createElement(XMLConsts.COMPUTER.text);
-            computer.setAttribute(XMLConsts.NAME.text, computerName);
-            targetElement.appendChild(computer);
-            element.appendChild(targetElement);
-            count++;
-        }
-        String actionBody = xmlParser.convertDocToString(doc);
+        String actionBody= modifyPlanDefXmlTemplate(fixletDetails, response);
         String uri = jsonParser.getUriToTakeActionOnPlan(planConsoleApiObject);
-        HashMap<String, String> params = new HashMap<>();
         params.put(CreatePlanConsts.PLAN_ID.text, planID);
         RequestSpecification requestSpecification = apiRequests.setWasLibertyURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
                 .and().pathParam(CreatePlanConsts.PLAN_ID.text, params.get(CreatePlanConsts.PLAN_ID.text)).and().body(actionBody);
@@ -224,7 +188,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.debug("Response after initiating the action: \n" + planActionID);
     }
 
-    public String getApplicableComputerName(String fixletID) throws IOException, SAXException, ParserConfigurationException {
+    public String getApplicableComputerName(String fixletID) throws IOException, SAXException {
         String computerName = null;
         List<String> computerIDs = getApplicableComputersID(fixletID);
         int computerIDsSize = computerIDs.size();
@@ -243,7 +207,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         long startTime = System.currentTimeMillis();
         boolean waitUntillApplicableCompsDisp = true;
         do {
-            Response relevantMachines = consoleActions.getRelevantComputers(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, fixletID));
+            Response relevantMachines = consoleActions.getApplicableComputersApiResponse(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, fixletID));
             computerTagCount = xmlParser.getElementsByTagName(relevantMachines.asInputStream(), XMLConsts.COMPUTER_TAGNAME.text).getLength();
             waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
             if (!waitUntillApplicableCompsDisp) {
@@ -256,7 +220,7 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     public List<String> getApplicableComputersID(String fixletID) throws IOException, SAXException {
         List<String> compIDsList = new ArrayList<String>();
-        Response response = consoleActions.getRelevantComputers(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, fixletID));
+        Response response = consoleActions.getApplicableComputersApiResponse(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, fixletID));
         logger.debug("Relevant Machines = " + response.asString());
         List<String> computersList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), consoleActions.COMP_ATTR_XPATH);
         computersList.forEach(computer -> {
@@ -286,12 +250,31 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.debug("Response after deleting the plan = " + response.asString());
     }
 
-    public List<String> listOfPlans(HashMap<String, String> params) throws IOException, SAXException {
-        List<String> planList = new ArrayList<String>();
-        String uri = jsonParser.getUriToFetchListOfFixlets(consoleApiObject);
-        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().and().pathParams(params);
-        Response response = apiRequests.GET(requestSpecification, uri);
-        planList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), consoleActions.PLAN_NAME_XPATH);
-        return planList;
+    public String modifyPlanDefXmlTemplate(HashMap<String, String> fixletDetails, Response response) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+        XMLParser xmlParser = new XMLParser();
+        Document doc = xmlParser.buildDocument(response.asInputStream());
+        NodeList nodes = doc.getElementsByTagName(XMLConsts.STEP.text);
+        Assert.assertEquals("step and fixlet details length is different", fixletDetails.size(), nodes.getLength());
+        int count = 0;
+        for (Map.Entry<String, String> map : fixletDetails.entrySet()) {
+            Node node = nodes.item(count);
+            Element element = (Element) node;
+            String fixletID = map.getValue();
+            Integer computerTagCount = waitUntilApplicableCompsVisible(fixletID);
+            String computerName = null;
+            if (computerTagCount == 1) {
+                //TODO : Later try to use dynamic method from ConsoleActions
+                computerName = getApplicableComputerName(fixletID);
+            }
+            Element targetElement = doc.createElement(XMLConsts.TARGET_SET.text);
+            Element computer = doc.createElement(XMLConsts.COMPUTER.text);
+            computer.setAttribute(XMLConsts.NAME.text, computerName);
+            targetElement.appendChild(computer);
+            element.appendChild(targetElement);
+            count++;
+        }
+        String actionBody = xmlParser.convertDocToString(doc);
+        return actionBody;
     }
+
 }

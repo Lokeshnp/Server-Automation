@@ -9,18 +9,11 @@ import com.hcl.sa.utils.SuperClass;
 import com.hcl.sa.windows.AutomationPlans;
 import com.thoughtworks.gauge.Step;
 import com.thoughtworks.gauge.Table;
-import groovy.json.JsonOutput;
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.internal.common.classpath.ClassPathResolver;
-import io.restassured.matcher.RestAssuredMatchers;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.apache.groovy.json.internal.Exceptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,13 +34,13 @@ public class Create_Plan_Steps {
 
     @Step("User should be able to execute Uninstall Automation Plan Engine Fixlet on the server Machine")
     public void executeUninstallPeFixlet() throws ParserConfigurationException, SAXException, IOException, TransformerException {
-        consoleActions.takeAction(commonFunctions.defaultSiteDetails(ConsoleConsts.UNINSTALL_PE_FIXLET_ID.text));
+        consoleActions.takeActionOnRootServer(commonFunctions.setExternalSiteParams(ConsoleConsts.UNINSTALL_PE_FIXLET_ID.text));
         logger.info("Automation Plan engine is uninstalled");
     }
 
     @Step("Plan engine should be up and running")
     public void executeInstallPeFixlet() throws ParserConfigurationException, SAXException, IOException, TransformerException {
-        consoleActions.takeAction(commonFunctions.defaultSiteDetails(ConsoleConsts.INSTALL_PE_FIXLET_ID.text));
+        consoleActions.takeActionOnRootServer(commonFunctions.setExternalSiteParams(ConsoleConsts.INSTALL_PE_FIXLET_ID.text));
         logger.info("Automation Plan engine is uninstalled");
     }
 
@@ -87,7 +80,7 @@ public class Create_Plan_Steps {
     @Step("Create automation plan with baseline having multiple fixlets on following OS <table>")
     public void createPlanWithBaselineHavingFixlets(Table table) throws IOException, SAXException, TransformerException {
         //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA
-        HashMap<String, String> fixletDetails = consoleActions.createBaseline(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text);
+        HashMap<String, String> fixletDetails = consoleActions.createBaseline(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.FILEPATH.text, ConsoleConsts.SRCSITENAME.text );
         String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_BASELINE_PLAN.text, fixletDetails);
         logger.info("Created plan id : \n" + planID);
     }
@@ -121,7 +114,7 @@ public class Create_Plan_Steps {
     @Step("Create automation plan with baseline having multiple tasks on following OS <table>")
     public void createPlanWithBaselineHavingTasks(Table table) throws TransformerException, SAXException, IOException {
         //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA
-        HashMap<String, String> baselineDetails = consoleActions.createBaselineHavingTasks(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text);
+        HashMap<String, String> baselineDetails = consoleActions.createBaselineHavingTasks(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.FILEPATH.text, ConsoleConsts.SRCSITENAME.text);
         String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_BASELINE_TASKS_PLAN.text, baselineDetails);
         logger.info("Created plan id : \n" + planID);
     }
@@ -168,19 +161,20 @@ public class Create_Plan_Steps {
         logger.info("Executed plan id : \n" + planID);
     }
 
-    @Step("Verify the automation plan(fixlet) Get API with external site automation plan ID")
+    @Step("When User sends SA-REST Get Api Request for the existing external site automation plan")
     public void verifyPlanWithExternalSite() throws IOException, SAXException {
-        List<String> plans = automationPlans.listOfPlans(commonFunctions.commonParams(ConsoleConsts.EXTERNAL.text, ConsoleConsts.SERVER_AUTOMATION.text));
+        List<String> plans = consoleActions.getPlansList(commonFunctions.commonParams(ConsoleConsts.EXTERNAL.text, ConsoleConsts.SERVER_AUTOMATION.text));
         for (int i = 0; i < plans.size(); i++) {
             RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
                     and().pathParams(commonFunctions.saRestCommonParams(ConsoleConsts.EXTERNAL.text, ConsoleConsts.SERVER_AUTOMATION.text, plans.get(i)));
             Response response = automationPlans.getPlanXml(requestSpecification);
             response.then().statusCode(200);
+            logger.info("Generated response is : \n" + response);
         }
     }
 
-    @Step("Create automation plan with custom site fixlets on following OS <table>")
-    public void createPlanWithCustomSite(Table table) throws IOException, SAXException {
+    @Step("User creates a custom site plan")
+    public void createPlanWithCustomSite() throws IOException, SAXException {
         RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
                 contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
                 pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text));
@@ -189,12 +183,13 @@ public class Create_Plan_Steps {
         logger.info("Created plan id : \n" + planID);
     }
 
-    @Step("Verify the automation plan(fixlet) Get API with custom site automation plan ID")
+    @Step("And checks whether sa rest GET api works for it")
     public void verifyPlanWithCustomSite() throws IOException, SAXException {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
                 and().pathParams(commonFunctions.saRestCommonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, planID));
         Response response = automationPlans.getPlanXml(requestSpecification);
         response.then().statusCode(200);
+        logger.info("Generated response is : \n" + response);
     }
 }
