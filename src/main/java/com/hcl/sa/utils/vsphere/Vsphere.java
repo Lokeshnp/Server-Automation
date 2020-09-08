@@ -1,5 +1,6 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.vsphere;
 
+import com.hcl.sa.utils.bigfix.Credentials;
 import vmware.samples.VsphereUtils;
 
 public class Vsphere {

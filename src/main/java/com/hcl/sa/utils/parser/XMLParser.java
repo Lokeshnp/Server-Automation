@@ -1,4 +1,4 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.parser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +24,10 @@ public class XMLParser {
     Logger logger = LogManager.getLogger(XMLParser.class);
 
     public String xmlFilePath = null;
+
+
+
+    
 
     public Document buildDocument(InputStream inputData){
         Document doc = null;
@@ -66,6 +70,7 @@ public class XMLParser {
         }
         return element;
     }
+
 
     public String convertDocToString(Document doc) throws TransformerException {
        DOMSource domSource = new DOMSource(doc);

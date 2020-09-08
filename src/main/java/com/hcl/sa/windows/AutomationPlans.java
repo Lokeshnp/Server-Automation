@@ -3,8 +3,13 @@ package com.hcl.sa.windows;
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.*;
 import com.hcl.sa.objectRepository.AutomationPlanLocators;
-import com.hcl.sa.utils.*;
-import com.sun.org.apache.xerces.internal.xni.XMLLocator;
+import com.hcl.sa.utils.api.ApiRequests;
+import com.hcl.sa.utils.bigfix.CommonFunctions;
+import com.hcl.sa.utils.bigfix.ConsoleActions;
+import com.hcl.sa.utils.bigfix.SuperClass;
+import com.hcl.sa.utils.parser.JsonParser;
+import com.hcl.sa.utils.parser.XMLParser;
+import com.hcl.sa.utils.winappdriver.WinAppDriverActions;
 import io.appium.java_client.windows.WindowsDriver;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -22,7 +27,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +50,7 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     public void clickCreateBtn() {
         WebElement createBtn = winActions.winDriver.findElementByAccessibilityId(create_btn_access_id);
-        winActions.hardWait(TimeOutConsts.WAIT_3000_SEC.seconds); //js error on click of create button
+        winActions.hardWait(TimeOutConsts.WAIT_3_SEC.seconds);
         winActions.waitForElementVisibilityAndClick(createBtn, TimeOutConsts.WAIT_10_SECONDS.seconds);
     }
 
@@ -91,7 +95,6 @@ public class AutomationPlans implements AutomationPlanLocators {
         WebElement searchPlanTextBox = winActions.findElementByAccessibilityId(search_plan_text_box_access_id);
         searchPlanTextBox.clear();
         searchPlanTextBox.sendKeys(planName);
-        // winActions.waitForListVisibility(winActions.findElementsByName(planName),TimeOutConsts.WAIT_10_SECONDS.seconds);
         winActions.findElementByName(planName).click();
     }
 

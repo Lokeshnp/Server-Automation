@@ -1,4 +1,4 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.bigfix;
 
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
@@ -6,7 +6,10 @@ import com.hcl.sa.constants.CreatePlanConsts;
 import com.hcl.sa.constants.TimeOutConsts;
 import com.hcl.sa.constants.XMLConsts;
 import com.hcl.sa.objectRepository.XmlLocators;
-import com.hcl.sa.windows.AutomationPlans;
+import com.hcl.sa.utils.api.ApiRequests;
+import com.hcl.sa.utils.api.Payload;
+import com.hcl.sa.utils.parser.JsonParser;
+import com.hcl.sa.utils.parser.XMLParser;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -15,10 +18,6 @@ import java.io.InputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -28,7 +27,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class ConsoleActions implements XmlLocators {
@@ -120,7 +118,7 @@ public class ConsoleActions implements XmlLocators {
         String actionID = null;
         if (computerTagCount == 1) {
             String initiateActionPayloadPath = CommonFunctions.getPath(ConsoleConsts.TAKE_ACTION_PAYLOAD_PATH.text);
-            String body = payload.createAction(new FileInputStream(initiateActionPayloadPath), params, computerID);
+            String body = payload.modifyTakeActionPayload(new FileInputStream(initiateActionPayloadPath), params, computerID);
             response = getTakeActionApiResponse(body);
             actionID = getActionID(response.asInputStream());
             waitTillXmlResponseReceived(actionID);
@@ -221,15 +219,14 @@ public class ConsoleActions implements XmlLocators {
             }
         }
         logger.debug("Imported task details=" + taskID);
+        //TODO : Every where we have declared FIXLET_DETAILS to store fxilets, tasks details, to maintain symmetry we are giving fixlet details names for taskID
         SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, taskID);
         return taskID;
     }
 
     public HashMap<String, String> createBaseline(String siteType, String siteName, String filePath, String srcSiteName) throws IOException, SAXException, TransformerException {
         HashMap<String, String> baselineDetails = new HashMap<>();
-         filePath = CommonFunctions.getPath(ConsoleConsts.BASELINE_FIXLETS_FOLDER.text);
         String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
-        srcSiteName = ConsoleConsts.CUSTOM_SITE.text + "_" + siteName;
         logger.debug("Baseline Folder path=" + filePath);
         RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
                 contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
@@ -245,12 +242,10 @@ public class ConsoleActions implements XmlLocators {
         SuperClass.specStore.put(CreatePlanConsts.BASELINE_DETAILS, baselineDetails);
         return baselineDetails;
     }
-   //TODO : Later try to convert a reusable code into method
+    //TODO : Later try to convert a reusable code into method
     public HashMap<String, String> createBaselineHavingTasks(String siteType, String siteName, String filePath, String srcSiteName) throws IOException, SAXException, TransformerException {
         HashMap<String, String> baselineDetails = new HashMap<>();
-        filePath = CommonFunctions.getPath(ConsoleConsts.BASELINE_TASKS_FOLDER.text);
         String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
-        srcSiteName = ConsoleConsts.CUSTOM_SITE.text + "_" + siteName;
         logger.debug("Baseline Folder path=" + filePath);
         RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
                 contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
@@ -299,18 +294,16 @@ public class ConsoleActions implements XmlLocators {
         return FixletAndTaskID;
     }
 
-    public HashMap<String, String> createBaselineHavingFixletsAndTasks(String siteType, String siteName) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+    public HashMap<String, String> createBaselineHavingFixletsAndTasks(String siteType, String siteName, String filePath, String srcSiteName) throws IOException, SAXException, TransformerException, ParserConfigurationException {
         HashMap<String, String> baselineDetails = new HashMap<>();
-        String baselineFixletsAndTasksFolderPath = CommonFunctions.getPath(ConsoleConsts.BASELINE_FIXLETS_AND_TASKS_FOLDER.text);
         String baselinePayloadPath = CommonFunctions.getPath(ConsoleConsts.CREATE_BASELINE_PAYLOAD_PATH.text);
-        String sourceSiteName = ConsoleConsts.CUSTOM_SITE.text + "_" + siteName;
-        logger.debug("Baseline Fixlets and Tasks Folder path=" + baselineFixletsAndTasksFolderPath);
+        logger.debug("Baseline Fixlets and Tasks Folder path=" + filePath);
         RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
                 contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
                 pathParams(commonFunctions.commonParams(siteType, siteName));
-        createFixletsAndTasks(CommonFunctions.getPath(baselineFixletsAndTasksFolderPath), requestSpecification);
+        createFixletsAndTasks(CommonFunctions.getPath(filePath), requestSpecification);
         //TODO : Source site url computer name should be dynamic
-        String body = payload.createBaseline(new FileInputStream(baselinePayloadPath), sourceSiteName);
+        String body = payload.createBaseline(new FileInputStream(baselinePayloadPath), srcSiteName);
         logger.debug("API  Request body for sending API=" + body);
         String uri = jsonParser.getUriToCreateBaseline(jsonParser.getConsoleApiObject());
         Response response = apiRequests.POST(requestSpecification, uri, body);
@@ -322,7 +315,7 @@ public class ConsoleActions implements XmlLocators {
 
     public List<String> getPlansList(HashMap<String, String> params) throws IOException, SAXException {
         List<String> planList = new ArrayList<String>();
-        String uri = jsonParser.getUriToFetchFixletLIist(consoleApiObject);
+        String uri = jsonParser.getUriToFetchFixletList(consoleApiObject);
         RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().and().pathParams(params);
         Response response = apiRequests.GET(requestSpecification, uri);
         planList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), PLAN_NAME_XPATH);

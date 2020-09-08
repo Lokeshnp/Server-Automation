@@ -1,7 +1,8 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.api;
 
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.CreatePlanConsts;
+import com.hcl.sa.utils.bigfix.Credentials;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;

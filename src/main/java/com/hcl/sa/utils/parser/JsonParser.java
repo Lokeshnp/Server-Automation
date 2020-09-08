@@ -1,10 +1,12 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.parser;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.CreatePlanConsts;
 import com.hcl.sa.constants.VsphereConsts;
+import com.hcl.sa.utils.bigfix.CommonFunctions;
+import com.hcl.sa.utils.bigfix.SuperClass;
 
 public class JsonParser {
     JsonElement consoleObj = SuperClass.getInstance().getJsonParser(CommonFunctions.getPath(ConsoleConsts.BIGFIX_API_JSON_PATH.text)).getAsJsonObject().get(ConsoleConsts.BIGFIX_API.text);
@@ -14,7 +16,7 @@ public class JsonParser {
     }
 
     public JsonObject getBaselineFixletObj(){
-            return  vmObj.getAsJsonObject().get(VsphereConsts.BASELINE_FIXLETS.text).getAsJsonObject();
+        return  vmObj.getAsJsonObject().get(VsphereConsts.BASELINE_FIXLETS.text).getAsJsonObject();
     }
 
     public String getUriToDeleteAction(JsonObject jsonObject) {
@@ -77,7 +79,7 @@ public class JsonParser {
         return jsonObject.get(CreatePlanConsts.EXECUTE_PLAN.text).getAsString();
     }
 
-    public String getUriToFetchFixletLIist(JsonObject jsonObject) {
+    public String getUriToFetchFixletList(JsonObject jsonObject) {
         return jsonObject.get(ConsoleConsts.FIXLET_LIST.text).getAsString();
     }
 

@@ -2,10 +2,10 @@ package com.hcl.sa.steps;
 
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.CreatePlanConsts;
-import com.hcl.sa.utils.ApiRequests;
-import com.hcl.sa.utils.CommonFunctions;
-import com.hcl.sa.utils.ConsoleActions;
-import com.hcl.sa.utils.SuperClass;
+import com.hcl.sa.utils.api.ApiRequests;
+import com.hcl.sa.utils.bigfix.CommonFunctions;
+import com.hcl.sa.utils.bigfix.ConsoleActions;
+import com.hcl.sa.utils.bigfix.SuperClass;
 import com.hcl.sa.windows.AutomationPlans;
 import com.thoughtworks.gauge.Step;
 import com.thoughtworks.gauge.Table;
@@ -80,7 +80,7 @@ public class Create_Plan_Steps {
     @Step("Create automation plan with baseline having multiple fixlets on following OS <table>")
     public void createPlanWithBaselineHavingFixlets(Table table) throws IOException, SAXException, TransformerException {
         //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA
-        HashMap<String, String> fixletDetails = consoleActions.createBaseline(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.FILEPATH.text, ConsoleConsts.SRCSITENAME.text );
+        HashMap<String, String> fixletDetails = consoleActions.createBaseline(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.BASELINE_FIXLETS_FOLDER.text, ConsoleConsts.SRC_SITENAME.text );
         String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_BASELINE_PLAN.text, fixletDetails);
         logger.info("Created plan id : \n" + planID);
     }
@@ -113,8 +113,8 @@ public class Create_Plan_Steps {
 
     @Step("Create automation plan with baseline having multiple tasks on following OS <table>")
     public void createPlanWithBaselineHavingTasks(Table table) throws TransformerException, SAXException, IOException {
-        //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA
-        HashMap<String, String> baselineDetails = consoleActions.createBaselineHavingTasks(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.FILEPATH.text, ConsoleConsts.SRCSITENAME.text);
+        //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA   ConsoleConsts.BASELINE_TASKS_FOLDER.text
+        HashMap<String, String> baselineDetails = consoleActions.createBaselineHavingTasks(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.BASELINE_TASKS_FOLDER.text, ConsoleConsts.SRC_SITENAME.text);
         String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_BASELINE_TASKS_PLAN.text, baselineDetails);
         logger.info("Created plan id : \n" + planID);
     }
@@ -133,7 +133,7 @@ public class Create_Plan_Steps {
                 contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
                 pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text));
         HashMap<String, String> fixletDetails = consoleActions.createFixletsAndTasks(CommonFunctions.getPath(ConsoleConsts.FIXLETS_TASKS_FOLDER.text), requestSpecification);
-        String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_FIXLETSANDTASKS_PLAN.text, fixletDetails);
+        String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_FIXLETS_AND_TASKS_PLAN.text, fixletDetails);
         logger.info("Created plan id : \n" + planID);
     }
 
@@ -148,8 +148,8 @@ public class Create_Plan_Steps {
     @Step("Create automation plan with baseline having multiple fixlets and tasks on following OS <table>")
     public void createPlanWithBaselineHavingFixletsAndTasks(Table table) throws TransformerException, SAXException, IOException, ParserConfigurationException {
         //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA
-        HashMap<String, String> baselineDetails = consoleActions.createBaselineHavingFixletsAndTasks(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text);
-        String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_FIXLETSANDTASKS_PLAN.text, baselineDetails);
+        HashMap<String, String> baselineDetails = consoleActions.createBaselineHavingFixletsAndTasks(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.BASELINE_FIXLETS_AND_TASKS_FOLDER.text, ConsoleConsts.SRC_SITENAME.text);
+        String planID = automationPlans.createPlan(CreatePlanConsts.MULTIPLE_FIXLETS_AND_TASKS_PLAN.text, baselineDetails);
         logger.info("Created plan id : \n" + planID);
     }
 

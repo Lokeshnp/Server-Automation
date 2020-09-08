@@ -1,8 +1,10 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.api;
 
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.CreatePlanConsts;
 import com.hcl.sa.constants.XMLConsts;
+import com.hcl.sa.utils.bigfix.SuperClass;
+import com.hcl.sa.utils.parser.XMLParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -54,7 +56,7 @@ public class Payload {
         return xmlParser.convertDocToString(doc);
     }
 
-    public String createAction(FileInputStream fis, HashMap<String, String> params, String computerID) throws TransformerException {
+    public String modifyTakeActionPayload(FileInputStream fis, HashMap<String, String> params, String computerID) throws TransformerException {
         Document doc = xmlParser.buildDocument(fis);
         //Tags in the xml are not proper format so hard coding the tagname of the xml
         doc.getElementsByTagName("Sitename").item(0).setTextContent(params.get(ConsoleConsts.SITE_NAME.text));

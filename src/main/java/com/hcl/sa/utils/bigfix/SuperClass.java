@@ -1,4 +1,4 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.bigfix;
 
 import com.hcl.sa.capabilities.WinAppDriverCaps;
 import com.hcl.sa.constants.WinAppConsts;
@@ -22,7 +22,7 @@ public class SuperClass {
     private volatile  static SuperClass obj;
     private JsonElement jsonElement = null;
     public static DataStore specStore = DataStoreFactory.getSpecDataStore();
-    private Logger logger = LogManager.getLogger(com.hcl.sa.utils.SuperClass.class);
+    private Logger logger = LogManager.getLogger(SuperClass.class);
     private Runtime runtime = null;
     private static Process process = null;
     private volatile WindowsDriver<WebElement> windowsDriver = null;

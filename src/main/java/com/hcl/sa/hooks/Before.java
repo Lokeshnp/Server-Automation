@@ -1,9 +1,8 @@
 package com.hcl.sa.hooks;
 
-import com.hcl.sa.constants.ConsoleConsts;
-import com.hcl.sa.utils.ConsoleActions;
-import com.hcl.sa.utils.Credentials;
-import com.hcl.sa.utils.Login;
+import com.hcl.sa.utils.bigfix.ConsoleActions;
+import com.hcl.sa.utils.bigfix.Credentials;
+import com.hcl.sa.utils.bigfix.Login;
 import com.hcl.sa.windows.AllContent;
 import com.thoughtworks.gauge.BeforeSuite;
 import org.apache.logging.log4j.LogManager;

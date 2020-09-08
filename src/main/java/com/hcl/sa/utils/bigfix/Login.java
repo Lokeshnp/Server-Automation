@@ -1,8 +1,9 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.bigfix;
 
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.TimeOutConsts;
 import com.hcl.sa.objectRepository.ConsoleLoginLocators;
+import com.hcl.sa.utils.winappdriver.WinAppDriverActions;
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

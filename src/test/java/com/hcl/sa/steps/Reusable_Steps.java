@@ -1,9 +1,7 @@
 package com.hcl.sa.steps;
 
-import com.hcl.sa.utils.Credentials;
-import com.hcl.sa.utils.Login;
+import com.hcl.sa.utils.bigfix.Login;
 import com.hcl.sa.windows.AllContent;
-import com.thoughtworks.gauge.Step;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

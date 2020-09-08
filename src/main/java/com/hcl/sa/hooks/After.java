@@ -1,9 +1,7 @@
 package com.hcl.sa.hooks;
 
-import com.hcl.sa.constants.ConsoleConsts;
-import com.hcl.sa.utils.Login;
-import com.hcl.sa.utils.SuperClass;
-import com.thoughtworks.gauge.AfterSpec;
+import com.hcl.sa.utils.bigfix.Login;
+import com.hcl.sa.utils.bigfix.SuperClass;
 import com.thoughtworks.gauge.AfterSuite;
 
 import java.io.IOException;

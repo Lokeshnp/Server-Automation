@@ -1,4 +1,4 @@
-package com.hcl.sa.utils;
+package com.hcl.sa.utils.bigfix;
 
 public enum Credentials {
     CONSOLE{
