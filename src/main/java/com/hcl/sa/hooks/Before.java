@@ -1,21 +1,23 @@
 package com.hcl.sa.hooks;
 
+import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.utils.bigfix.ConsoleActions;
 import com.hcl.sa.utils.bigfix.Credentials;
 import com.hcl.sa.utils.bigfix.Login;
 import com.hcl.sa.windows.AllContent;
+import com.thoughtworks.gauge.BeforeScenario;
 import com.thoughtworks.gauge.BeforeSuite;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+
 
 public class Before {
     protected Login login = new Login();
     protected AllContent allContent = new AllContent();
-    private Logger logger = LogManager.getLogger(Before.class);
+    private final Logger logger = LogManager.getLogger(Before.class);
     ConsoleActions consoleActions = new ConsoleActions();
 
 

@@ -6,6 +6,7 @@ import com.hcl.sa.objectRepository.AutomationPlanLocators;
 import com.hcl.sa.utils.api.ApiRequests;
 import com.hcl.sa.utils.bigfix.CommonFunctions;
 import com.hcl.sa.utils.bigfix.ConsoleActions;
+import com.hcl.sa.utils.bigfix.FixletDetails;
 import com.hcl.sa.utils.bigfix.SuperClass;
 import com.hcl.sa.utils.parser.JsonParser;
 import com.hcl.sa.utils.parser.XMLParser;
@@ -50,7 +51,8 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     public void clickCreateBtn() {
         WebElement createBtn = winActions.winDriver.findElementByAccessibilityId(create_btn_access_id);
-        winActions.hardWait(TimeOutConsts.WAIT_3_SEC.seconds);
+        int seconds = (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_3_SEC.seconds);
+        winActions.hardWait(seconds);
         winActions.waitForElementVisibilityAndClick(createBtn, TimeOutConsts.WAIT_10_SECONDS.seconds);
     }
 
@@ -176,7 +178,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         return response;
     }
 
-    public void executePlan(String planID, HashMap<String, String> fixletDetails) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+    public void executePlan(String planID, HashMap<String, String> fixletDetails) throws Exception {
         HashMap<String, String> params = new HashMap<>();
         Response response = getPlanXml(planID);
         logger.debug("Initiated the execute plan" + response.toString());
@@ -205,7 +207,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         return computerName;
     }
 
-    public Integer waitUntilApplicableCompsVisible(String fixletID) throws IOException, SAXException, ParserConfigurationException {
+    public Integer waitUntilApplicableCompsVisible(String fixletID) throws Exception {
         int computerTagCount;
         long startTime = System.currentTimeMillis();
         boolean waitUntillApplicableCompsDisp = true;
@@ -215,7 +217,7 @@ public class AutomationPlans implements AutomationPlanLocators {
             waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
             if (!waitUntillApplicableCompsDisp) {
                 logger.info("Applicable computers are zero for this fixlet ");
-                break;
+                throw new Exception("appicable computers are not visisble");
             }
         } while (computerTagCount == 0);
         return computerTagCount;
@@ -253,7 +255,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.debug("Response after deleting the plan = " + response.asString());
     }
 
-    public String modifyPlanDefXmlTemplate(HashMap<String, String> fixletDetails, Response response) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+    public String modifyPlanDefXmlTemplate(HashMap<String, String> fixletDetails, Response response) throws Exception {
         XMLParser xmlParser = new XMLParser();
         Document doc = xmlParser.buildDocument(response.asInputStream());
         NodeList nodes = doc.getElementsByTagName(XMLConsts.STEP.text);
@@ -278,6 +280,14 @@ public class AutomationPlans implements AutomationPlanLocators {
         }
         String actionBody = xmlParser.convertDocToString(doc);
         return actionBody;
+    }
+
+    public FixletDetails getPeInstallFixletDetails(String fixletID) {
+        return new FixletDetails.Builder().setSiteName(ConsoleConsts.SITE_NAME.text)
+                .setSiteType(ConsoleConsts.SITE_TYPE.text)
+                .setFixletID(fixletID)
+                .build();
+
     }
 
 }

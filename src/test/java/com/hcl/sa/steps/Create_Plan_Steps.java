@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class Create_Plan_Steps {
 
     protected ConsoleActions consoleActions = new ConsoleActions();
-    private final Logger logger = LogManager.getLogger(AutomationPlans.class);
+    private Logger logger = LogManager.getLogger(Create_Plan_Steps.class);
     protected AutomationPlans automationPlans = new AutomationPlans();
     ApiRequests apiRequests = new ApiRequests();
     CommonFunctions commonFunctions = new CommonFunctions();
@@ -56,7 +56,7 @@ public class Create_Plan_Steps {
     }
 
     @Step("Then execute automation plan with multiple fixlets on following OS <table>")
-    public void executePlanWithMultipleFixlets(Table table) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+    public void executePlanWithMultipleFixlets(Table table) throws Exception {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);
@@ -86,7 +86,7 @@ public class Create_Plan_Steps {
     }
 
     @Step("Then execute automation plan with baseline having multiple fixlets on following OS <table>")
-    public void executePlanHavingBaseline(Table table) throws TransformerException, SAXException, IOException, ParserConfigurationException {
+    public void executePlanHavingBaseline(Table table) throws Exception {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.BASELINE_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);
@@ -104,7 +104,7 @@ public class Create_Plan_Steps {
     }
 
     @Step("Then execute automation plan with multiple tasks on following OS <table>")
-    public void executePlanWithMultipleTasks(Table table) throws TransformerException, SAXException, IOException, ParserConfigurationException {
+    public void executePlanWithMultipleTasks(Table table) throws Exception {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);
@@ -120,7 +120,7 @@ public class Create_Plan_Steps {
     }
 
     @Step("Then execute automation plan with baseline having multiple tasks on following OS <table>")
-    public void executePlanWithBaselineHavingTasks(Table table) throws TransformerException, SAXException, IOException, ParserConfigurationException {
+    public void executePlanWithBaselineHavingTasks(Table table) throws Exception {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         HashMap<String, String> baselineDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.BASELINE_DETAILS);
         automationPlans.executePlan(planID, baselineDetails);
@@ -138,7 +138,7 @@ public class Create_Plan_Steps {
     }
 
     @Step("Then execute automation plan with multiple fixlets and tasks on following OS <table>")
-    public void executePlanWithFixletsAndTasks(Table table) throws TransformerException, SAXException, IOException, ParserConfigurationException {
+    public void executePlanWithFixletsAndTasks(Table table) throws Exception {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);
@@ -154,7 +154,7 @@ public class Create_Plan_Steps {
     }
 
     @Step("Then execute automation plan with baseline having fixlets and tasks on following OS <table>")
-    public void executePlanWithBaselineHavingFixletsAndTasks(Table table) throws SAXException, TransformerException, ParserConfigurationException, IOException {
+    public void executePlanWithBaselineHavingFixletsAndTasks(Table table) throws Exception {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.BASELINE_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);

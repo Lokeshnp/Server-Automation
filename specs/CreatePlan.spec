@@ -95,3 +95,8 @@ tags:baselineHavingFixletsAndTasks
 |Linux   |
 * Verify action status and wait untill it got executed sucessfully
 * And delete the Plan after status verification
+
+//////Uninstallation of plan engine
+//////--------------------------------------------------------------
+//////*tags:uninstall
+//////* User should be able to execute Uninstall Automation Plan Engine Fixlet on the server Machine
