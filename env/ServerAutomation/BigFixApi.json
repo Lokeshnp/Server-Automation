@@ -1,0 +1,36 @@
+{
+  "bigfixApi": {
+    "consoleApi": {
+      "relevantComputers": "api/fixlet/{siteType}/{siteName}/{fixletID}/computers",
+      "initiateAction": "api/actions",
+      "actionStatus": "api/action/{actionID}/status",
+      "stopAction": "api/action/{actionID}/stop",
+      "compProperties": "api/computer/{computerID}",
+      "deleteAction": "/api/action/{actionID}",
+      "importFixlet": "api/import/{siteType}/{siteName}",
+      "createBaselines":"api/baselines/{siteType}/{siteName}",
+      "createTasks" : "api/tasks/{siteType}/{siteName}",
+      "fixletList": "api/fixlets/{siteType}/{siteName}",
+      "deletePlan": "api/fixlet/master/{fixletID}"
+    },
+    "siteType": {
+      "external": "external",
+      "custom": "custom"
+    },
+    "siteName": {
+      "serverAutomation": "Server Automation",
+      "Abhinav":"Abhinav",
+      "Pooja":"Pooja",
+      "master": "master"
+    },
+    "wasLibertyApi" : {
+      "planExecutionTemplate" : "serverautomation/plan/master/{planID}",
+      "executePlan" : "serverautomation/plan/master/{planID}"
+    },
+
+    "saRestApi" : {
+      "planExecutionTemplate" : "serverautomation/plan/{siteType}/{siteName}/{planID}",
+      "executePlan" : "serverautomation/plan/{siteType}/{siteName}/{planID}"
+    }
+  }
+}
