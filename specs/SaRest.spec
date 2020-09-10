@@ -1,4 +1,4 @@
-# User should be able to excute & view the plan status through SA-REST API's. In order to execute Plan engine & SA-REST API Service should be up & running
+# User should be able to excute & view the plan status through SA-REST API's. In order to execute Plan engine, SA-REST API Service should be up & running
 
 //Installation of SA-REST API Service
 //-------------------------------------------------------------------------------
@@ -16,11 +16,11 @@ tags: external
 //* And response body as plan definition xml template
 //* And user should validate the plan defination xml template
 
-//Verify SA-REST Get API works for custom site automation plan
-//---------------------------------------------------------------------------------------
-//*tags: custom
-//* User creates a custom site plan
-//* And checks whether sa rest GET api works for it
+Verify SA-REST Get API works for custom site automation plan
+---------------------------------------------------------------------------------------
+tags: custom
+* User creates a custom site plan
+* And checks whether sa rest GET api works for it
 //* And gets response as http 200 status code
 //* And response body as plan defintion xml template
 //* And user validate whether plan definition xml template is proper or not

@@ -15,4 +15,6 @@ public interface XmlLocators {
     String STATUS = "//Status/text()";
     String COMPUTER_NAME = "//Computer/Property[@Name ='Computer Name']/text()";
     String NODE_LIST_XPATH = "//BES/*";
+
+
 }

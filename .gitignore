@@ -1,1 +1,15 @@
 /reports/
+/target/
+/logs/
+/.gauge/
+/.idea/
+/src/main/resources/
+/sa-dashboard-automation.iml
+htmlLogs/
+
+
+
+
+
+
+
