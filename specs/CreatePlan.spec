@@ -96,7 +96,39 @@ tags:baselineHavingFixletsAndTasks
 * Verify action status and wait untill it got executed sucessfully
 * And delete the Plan after status verification
 
-Uninstallation of plan engine
---------------------------------------------------------------
-tags:uninstall
-* User should be able to execute Uninstall Automation Plan Engine Fixlet on the server Machine
+Create & execute automation plan with a combination of baseline, fixlets and tasks
+---------------------------------------------------------------------------------
+tags:combinationOfBaselineFixletsTasks
+* Create automation plan with a combination of baseline, fixlets and tasks on following OS
+|OS Name |
+|--------|
+|windows |
+|Linux   |
+* Then execute automation plan with a combination of baselines, fixlets and tasks on following OS
+|OS Name |
+|--------|
+|windows |
+|Linux   |
+* Verify action status and wait untill it got executed sucessfully
+* And delete the Plan after status verification
+
+Create & execute parallel automation plan
+--------------------------------------------------------
+tags: parallel
+* Create parallel automation plan on following OS
+|OS Name |
+|--------|
+|windows |
+|Linux   |
+* Then execute parallel automation plan on following OS
+|OS Name |
+|--------|
+|windows |
+|Linux   |
+* Verify action status and wait untill it got executed sucessfully
+* And delete the Plan after status verification
+
+//Uninstallation of plan engine
+//--------------------------------------------------------------
+//*tags:uninstall
+//* User should be able to execute Uninstall Automation Plan Engine Fixlet on the server Machine

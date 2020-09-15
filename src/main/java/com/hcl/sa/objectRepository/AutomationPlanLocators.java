@@ -16,4 +16,5 @@ public interface AutomationPlanLocators {
       String add_step_combobox_tagname = "ComboBox";
       String name_filter_text_box_access_id = "filterWidgetTextbox_2";
       String id_filter_text_box_tagName = "Edit";
+      String parallel_radio_btn_using_name= "Parallel";
 }

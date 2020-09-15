@@ -86,6 +86,29 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.info("Step with name:" + fixletName + " is added to plan");
     }
 
+    public void parallelRadioBtn() {
+        winActions.findElementByName(parallel_radio_btn_using_name).click();
+        logger.info("Parallel Radio button is selected");
+    }
+
+    public void addDependency() {
+
+        List<WebElement> steps = winActions.findElementsByName("Fixlet/Task");
+        for (int i = 0; i < steps.size(); i++) {
+            steps.get(i).click();
+        }
+        winActions.hardWait(3000);
+        List<WebElement> list = winActions.findElementsByXpath("//*[contains(@Name,'Depends on:')]");
+        System.out.println("list="+list.size());
+        List<WebElement> list3 = winActions.findElementsByXpath("//Text[@Name='Summary']/parent::*/following-sibling::*");
+        System.out.println("list2="+list3.size());
+        for(int i = 0; i <list3.size() ; i++){
+            System.out.println("text="+list3.get(i).getAttribute("Name"));
+            list3.get(i).click();
+        }
+        winActions.findElementByXpath("//*[@Name='101']/preceding-sibling::*/CheckBox").click();
+
+    }
 
     public void savePlan() {
         winActions.findElementByName(save_btn_using_name).click();
@@ -288,6 +311,25 @@ public class AutomationPlans implements AutomationPlanLocators {
                 .setFixletID(fixletID)
                 .build();
 
+    }
+
+    public String createParallelPlan (String planName, HashMap < String, String > fixletDetails){
+        logger.info("Plan creation in progress...");
+        clickCreateBtn();
+        enterPlanName(planName);
+        for (Map.Entry<String, String> fixletDetail : fixletDetails.entrySet()) {
+            clickAddStepBtn();
+            String fixletName = fixletDetail.getKey().split(".bes")[0].trim();
+            addStepToPlan(fixletDetail.getValue(), fixletName);
+        }
+        parallelRadioBtn();
+        addDependency();
+        savePlan();
+        String planID = getPlanID(planName);
+        SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
+        logger.info("Plan Created");
+        //TODO revert back to planID
+        return planID;
     }
 
 }

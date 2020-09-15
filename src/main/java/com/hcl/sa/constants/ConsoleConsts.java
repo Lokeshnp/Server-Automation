@@ -13,7 +13,7 @@ public enum ConsoleConsts {
     CUSTOM("custom"),ABHINAV("Abhinav"),CREATE_BASELINE("createBaselines"),BASELINE_FIXLETS_AND_TASKS_FOLDER(System.getenv("baseline_fixlets_and_tasks_folder_path")),
     CREATE_BASELINE_PAYLOAD_PATH(System.getenv("create_baseline_payload_path")),FIXLET_ID_LIST, TASK_ID_LIST, CUSTOM_SITE("CustomSite"), POOJA("Pooja"),
     FILTER_ID("ID"), FIXLET_LIST("fixletList"), ACTION("Action"), DELETE_PLAN("deletePlan"), MASTER("master"), CREATE_TASKS("createTasks"),
-    FIXLETS_FOLDER(System.getenv("fixlets_folder_path")), TASKS_FOLDER(System.getenv("tasks_folder_path")), FIXLETS_TASKS_FOLDER(System.getenv("fixlets_and_tasks_folder_path")),
+    FIXLETS_FOLDER(System.getenv("fixlets_folder_path")), FIXLETS_AND_TASKS_FOLDER_PATH_FOR_PLAN_WITH_BASELINE_FIXLETS_TASKS(System.getenv("fixlets_and_tasks_folder_path_for_plan_with_baseline_fixlets_tasks")),TASKS_FOLDER(System.getenv("tasks_folder_path")), FIXLETS_TASKS_FOLDER(System.getenv("fixlets_and_tasks_folder_path")),
     TAKE_ACTION_PAYLOAD_PATH(System.getenv("take_action_payload_path")), MASTER_ACTION_SITE("Master Action Site"), FILEPATH("filePath"), SRC_SITENAME("CustomSite_Pooja"),
     FIXLET("Fixlet"), TASK("Task");
 
