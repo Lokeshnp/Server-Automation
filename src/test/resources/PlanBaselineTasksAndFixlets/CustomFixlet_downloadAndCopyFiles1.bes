@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
 	<Fixlet>
-		<Title>Custom Fixlet_download1</Title>
+		<Title>CustomFixlet_downloadAndCopyFiles1</Title>
 		<Description><![CDATA[&lt;enter a description of the task here&gt; ]]></Description>
 		<Relevance>true</Relevance>
 		<Category></Category>
@@ -24,9 +24,9 @@
 			</Description>
 			<ActionScript MIMEType="application/x-Fixlet-Windows-Shell">// Enter your action script here
 download https://www.mediacollege.com/video-gallery/testclips/20051210-w50s_56K.flv
-folder create "C:\TestSample1"
-copy "C:\Program Files (x86)\BigFix Enterprise\BES Client\__BESData\actionsite\__Download\20051210-w50s_56K.flv" "C:\TestSample1\20051210-w50s_56K.flv"
-folder delete "C:\TestSample1"</ActionScript>
+folder create "C:\TestSample"
+copy "C:\Program Files (x86)\BigFix Enterprise\BES Client\__BESData\actionsite\__Download\20051210-w50s_56K.flv" "C:\TestSample\20051210-w50s_56K.flv"
+folder delete "C:\TestSample"</ActionScript>
 			<SuccessCriteria Option="RunToCompletion"></SuccessCriteria>
 		</DefaultAction>
 	</Fixlet>
