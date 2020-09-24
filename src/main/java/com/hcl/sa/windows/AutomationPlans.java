@@ -26,8 +26,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +44,12 @@ public class AutomationPlans implements AutomationPlanLocators {
     JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
     CommonFunctions commonFunctions = new CommonFunctions();
-    ConsoleActions consoleActions=new ConsoleActions();
+    ConsoleActions consoleActions = new ConsoleActions();
 
 
     public void clickCreateBtn() {
         WebElement createBtn = winActions.winDriver.findElementByAccessibilityId(create_btn_access_id);
-        int seconds = (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_3_SEC.seconds);
+        int seconds = (int) commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_3_SEC.seconds);
         winActions.hardWait(seconds);
         winActions.waitForElementVisibilityAndClick(createBtn, TimeOutConsts.WAIT_10_SECONDS.seconds);
     }
@@ -86,6 +84,24 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.info("Step with name:" + fixletName + " is added to plan");
     }
 
+    public void clickParallelRadioBtn() {
+        winActions.findElementByName(parallel_radio_btn_using_name).click();
+        logger.info("Parallel Radio button is selected");
+    }
+
+    public void addDependency() {
+
+        List<WebElement> steps = winActions.findElementsByName(fixlet_task_using_name);
+        for (int i = 0; i < steps.size(); i++) {
+            steps.get(i).click();
+        }
+        winActions.hardWait(3000);
+        List<WebElement> summary = winActions.findElementsByXpath(summary_using_xpath);
+        for (int i = 0; i < summary.size(); i++) {
+            summary.get(i).click();
+        }
+        winActions.findElementByXpath(select_check_box_using_xpath).click();
+    }
 
     public void savePlan() {
         winActions.findElementByName(save_btn_using_name).click();
@@ -182,7 +198,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         HashMap<String, String> params = new HashMap<>();
         Response response = getPlanXml(planID);
         logger.debug("Initiated the execute plan" + response.toString());
-        String actionBody= modifyPlanDefXmlTemplate(fixletDetails, response);
+        String actionBody = modifyPlanDefXmlTemplate(fixletDetails, response);
         String uri = jsonParser.getUriToTakeActionOnPlan(planConsoleApiObject);
         params.put(CreatePlanConsts.PLAN_ID.text, planID);
         RequestSpecification requestSpecification = apiRequests.setWasLibertyURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
@@ -290,4 +306,21 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     }
 
+    public String createParallelPlan(String planName, HashMap<String, String> fixletDetails) {
+        logger.info("Plan creation in progress...");
+        clickCreateBtn();
+        enterPlanName(planName);
+        for (Map.Entry<String, String> fixletDetail : fixletDetails.entrySet()) {
+            clickAddStepBtn();
+            String fixletName = fixletDetail.getKey().split(".bes")[0].trim();
+            addStepToPlan(fixletDetail.getValue(), fixletName);
+        }
+        clickParallelRadioBtn();
+        addDependency();
+        savePlan();
+        String planID = getPlanID(planName);
+        SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
+        logger.info("Plan Created");
+        return planID;
+    }
 }
