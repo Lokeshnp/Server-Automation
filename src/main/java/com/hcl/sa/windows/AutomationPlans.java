@@ -96,9 +96,9 @@ public class AutomationPlans implements AutomationPlanLocators {
             steps.get(i).click();
         }
         winActions.hardWait(3000);
-        List<WebElement> list3 = winActions.findElementsByXpath(summary_using_xpath);
-        for (int i = 0; i < list3.size(); i++) {
-            list3.get(i).click();
+        List<WebElement> summary = winActions.findElementsByXpath(summary_using_xpath);
+        for (int i = 0; i < summary.size(); i++) {
+            summary.get(i).click();
         }
         winActions.findElementByXpath(select_check_box_using_xpath).click();
     }
