@@ -234,7 +234,6 @@ public class Create_Plan_Steps {
         logger.info("Generated response is : \n" + response);
     }
 
-<<<<<<< HEAD
     @Step("User creates a master site plan having external site fixlets/tasks <table>")
     public void createPlanWithExternalFixlets(Table table) throws IOException, SAXException {
         HashMap<String, String> fixletDetails = new HashMap<>();
@@ -332,55 +331,4 @@ public class Create_Plan_Steps {
 
 
 
-
-
-
-
-
-
-
-=======
-    @Step("Create automation plan with a combination of baseline, fixlets and tasks on following OS <table>")
-    public void createMultipleCombinationPlan(Table table) throws IOException, SAXException, TransformerException, ParserConfigurationException {
-        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
-                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
-                pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text));
-        HashMap<String, String> fixletsAndTasksDetails = consoleActions.createFixletsAndTasks(CommonFunctions.getPath(ConsoleConsts.PLAN_BASELINE_FIXLETS_TASKS_FOLDER.text), requestSpecification);
-        HashMap<String, String> baselinID = consoleActions.createBaseline(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, ConsoleConsts.BASELINE_FIXLETS_FOLDER.text, ConsoleConsts.SRC_SITENAME.text);
-        fixletsAndTasksDetails.putAll(baselinID);
-        //Plan name is too long so declaring from code
-        String planID = automationPlans.createPlan("Plan with combination of fixlets_tasks_baseline", fixletsAndTasksDetails);
-        SuperClass.specStore.put(CreatePlanConsts.FIXLET_DETAILS, fixletsAndTasksDetails);
-        logger.info("Created plan id : \n" + planID);
-
-    }
-
-    @Step("Then execute automation plan with a combination of baselines, fixlets and tasks on following OS <table>")
-    public void executeMultipleCombinationPlan(Table table) throws Exception {
-        String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
-        HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
-        automationPlans.executePlan(planID, fixletDetails);
-        logger.info("Executed plan id : \n" + planID);
-    }
-
-    @Step("Create parallel automation plan on following OS <table>")
-    public void createParallelPlan(Table table) throws IOException, SAXException, TransformerException {
-        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
-                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
-                pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text));
-        HashMap<String, String> fixletDetails = consoleActions.importFixlet(CommonFunctions.getPath(ConsoleConsts.FIXLETS_FOLDER.text), requestSpecification);
-        String planID = automationPlans.createParallelPlan(CreatePlanConsts.PARALLEL_PLAN.text, fixletDetails);
-        logger.info("Created plan id : \n" + planID);
-
-    }
-
-    @Step("Then execute parallel automation plan on following OS <table>")
-    public void executeParallelPlan(Table table) throws Exception {
-        String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
-        HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
-        automationPlans.executePlan(planID, fixletDetails);
-        logger.info("Executed plan id : \n" + planID);
-
-    }
->>>>>>> 0f3688072cb1d8a650889ad0ecb1008d92774efa
 }
