@@ -1,12 +1,16 @@
 package com.hcl.sa.constants;
 
 public enum CreatePlanConsts {
-    SERVER_AUTOMATION("Server Automation"),MULTIPLE_FIXLETS_PLAN("Plan with Multiple Fixlets"), MULTIPLE_BASELINE_PLAN("Plan with Baselines"),
-    MULTIPLE_FIXLETS_AND_TASKS_PLAN("Plan with Baseline having Fixlets and Tasks"),MULTIPLE_TASKS_PLAN("Plan with Multiple Tasks"),MULTIPLE_BASELINE_TASKS_PLAN("Plan with Baselines having Tasks"),
+    SERVER_AUTOMATION("Server Automation"), MULTIPLE_FIXLETS_PLAN("Plan with Multiple Fixlets"), MULTIPLE_BASELINE_PLAN("Plan with Baselines"),
+    MULTIPLE_FIXLETS_AND_TASKS_PLAN("Plan with Baseline having Fixlets and Tasks"), MULTIPLE_TASKS_PLAN("Plan with Multiple Tasks"), MULTIPLE_BASELINE_TASKS_PLAN("Plan with Baselines having Tasks"),
     WAS_LIBERTY_SERVER_URI(System.getenv("was_liberty_server_uri")), SA_REST_SERVER_URI(System.getenv("sa_rest_server_uri")),
     WAS_LIBERTY_API_URI("wasLibertyApi"), PLAN_ID("planID"), PLAN_EXECUTION_TEMPLATE("planExecutionTemplate"),
     EXECUTE_PLAN("executePlan"), PLAN_ACTION_ID("planActionID"), FIXLET_DETAILS("fixletDetails"),
+<<<<<<< HEAD
     BASELINE_DETAILS("baselineDetails"), SA_REST_API_URI("saRestApi"), Response("response"),OS_DEPLOYMENT_SITE_FIXLET("os deployment site fixlet"),EXTERNAL_SITE_FIXLET("external site fixlet"),;
+=======
+    BASELINE_DETAILS("baselineDetails"), PARALLEL_PLAN("Parallel Plan"), SA_REST_API_URI("saRestApi");
+>>>>>>> 0f3688072cb1d8a650889ad0ecb1008d92774efa
 
     public String text;
 
