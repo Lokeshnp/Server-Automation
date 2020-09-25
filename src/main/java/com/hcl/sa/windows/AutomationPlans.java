@@ -43,7 +43,7 @@ public class AutomationPlans implements AutomationPlanLocators {
     JsonParser jsonParser = new JsonParser();
     XMLParser xmlParser = new XMLParser();
     JsonObject planConsoleApiObject = jsonParser.getPlanConsoleApiObject();
-    JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
+    public JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
     CommonFunctions commonFunctions = new CommonFunctions();
     ConsoleActions consoleActions=new ConsoleActions();
@@ -174,6 +174,12 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     public Response getPlanXml(RequestSpecification requestSpecification) {
         String uri = jsonParser.getUriToFetchPlanXml(saRestConsoleApiObject);
+        System.out.println("Uri="+uri);
+        Response response = apiRequests.GET(requestSpecification, uri);
+        return response;
+    }
+
+    public Response getPlanXml(RequestSpecification requestSpecification,String uri) {
         Response response = apiRequests.GET(requestSpecification, uri);
         return response;
     }

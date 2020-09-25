@@ -6,7 +6,9 @@ import com.hcl.sa.utils.bigfix.Credentials;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseOptions;
 import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
 
 import static io.restassured.RestAssured.given;
 
@@ -96,5 +98,14 @@ public class ApiRequests {
     public Response GET(RequestSpecification reqSpecs, String uri) {
         Response response = checkForStatusCode(reqSpecs.when().get(uri));
         return response;
+    }
+
+
+    public RequestSpecification invalidSaAuthentication() {
+        RestAssured.baseURI = CreatePlanConsts.SA_REST_SERVER_URI.text;;
+        RestAssured.useRelaxedHTTPSValidation();
+        RequestSpecification bigfixCredentials = given().auth().preemptive().basic("","");
+        return bigfixCredentials;
+
     }
 }

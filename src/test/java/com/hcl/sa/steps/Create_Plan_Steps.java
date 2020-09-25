@@ -6,14 +6,19 @@ import com.hcl.sa.utils.api.ApiRequests;
 import com.hcl.sa.utils.bigfix.CommonFunctions;
 import com.hcl.sa.utils.bigfix.ConsoleActions;
 import com.hcl.sa.utils.bigfix.SuperClass;
+import com.hcl.sa.utils.parser.JsonParser;
+import com.hcl.sa.utils.parser.XMLParser;
 import com.hcl.sa.windows.AutomationPlans;
 import com.thoughtworks.gauge.Step;
 import com.thoughtworks.gauge.Table;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+//import junit.framework.Assert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import org.junit.Assert;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,6 +36,8 @@ public class Create_Plan_Steps {
     protected AutomationPlans automationPlans = new AutomationPlans();
     ApiRequests apiRequests = new ApiRequests();
     CommonFunctions commonFunctions = new CommonFunctions();
+    JsonParser jsonParser = new JsonParser();
+    Response response;
 
     @Step("User should be able to execute Uninstall Automation Plan Engine Fixlet on the server Machine")
     public void executeUninstallPeFixlet() throws ParserConfigurationException, SAXException, IOException, TransformerException {
@@ -172,6 +179,40 @@ public class Create_Plan_Steps {
             logger.info("Generated response is : \n" + response);
         }
     }
+    @Step("And checks whether sa rest GET api works for it")
+    public void verifyPlanWithExistingExternalSiteFixlet() throws IOException, SAXException {
+        String PlanID = "419";
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text, PlanID);
+        System.out.println("requestSpecification = " + requestSpecification);
+        System.out.println("*****************************");
+        response = automationPlans.getPlanXml(requestSpecification, "serverautomation/plan/master/{planID}");
+        System.out.println("*****************************" + response.asString());
+        response.then().statusCode(200);
+        logger.info("Generated response is : \n" + response);
+    }
+
+    @Step("Then in response user should get http 200 status code")
+    public void InResponseUserShouldGetHttp200StatusCodeOrNot() throws IOException, SAXException {
+        Response response = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text, 424).when().get("serverautomation/plan/master/{planID}");
+        Integer statusCode = response.statusCode();
+        System.out.println("##########################" + statusCode);
+        Assert.assertEquals(200, statusCode.intValue());
+    }
+    @Step("And response body as plan defintion xml template")
+    public void XmlValidationsDefinition() {
+        XMLParser xmlParser = new XMLParser();
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(commonFunctions.saRestCommonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, "381"));
+        System.out.println("requestSpecification = " + requestSpecification);
+        String responseString = response.asString();
+        Assert.assertTrue(responseString.contains("execute-plan"));
+        Assert.assertTrue(responseString.contains("sa-rest"));
+        System.out.println("response=" + responseString);
+    }
+
+
 
     @Step("User creates a custom site plan")
     public void createPlanWithCustomSite() throws IOException, SAXException {
@@ -192,4 +233,109 @@ public class Create_Plan_Steps {
         response.then().statusCode(200);
         logger.info("Generated response is : \n" + response);
     }
+
+    @Step("User creates a master site plan having external site fixlets/tasks <table>")
+    public void createPlanWithExternalFixlets(Table table) throws IOException, SAXException {
+        HashMap<String, String> fixletDetails = new HashMap<>();
+        fixletDetails.put("BES Clients Have Incorrect Clock Time","15");
+        fixletDetails.put("Restart BES Clients","75");
+        String planID = automationPlans.createPlan(CreatePlanConsts.EXTERNAL_SITE_FIXLET.text, fixletDetails);
+        logger.info("Created plan id : \n" + planID);
+    }
+
+
+    @Step("And checks whether sa rest GET api works for it")
+    public void verifyPlanWithExternalSiteFixlet() throws IOException, SAXException {
+        String PlanID = "419";
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text, PlanID);
+        System.out.println("requestSpecification = " + requestSpecification);
+        System.out.println("*****************************");
+        response = automationPlans.getPlanXml(requestSpecification, "serverautomation/plan/master/{planID}");
+        System.out.println("*****************************" + response.asString());
+        response.then().statusCode(200);
+        logger.info("Generated response is : \n" + response);
+    }
+
+    @Step("And gets response as http 200 status code")
+        public void ThenInResponseUserShouldGetHttp200StatusCodeOrNot() throws IOException, SAXException {
+        Response response = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text, 424).when().get("serverautomation/plan/master/{planID}");
+        Integer statusCode = response.statusCode();
+
+        System.out.println("##########################" + statusCode);
+        Assert.assertEquals(200, statusCode.intValue());
+    }
+
+
+
+
+    @Step("And response body as plan defintion xml template")
+    public void XmlValidations() {
+        XMLParser xmlParser = new XMLParser();
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(commonFunctions.saRestCommonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, "381"));
+        System.out.println("requestSpecification = " + requestSpecification);
+        String responseString = response.asString();
+        Assert.assertTrue(responseString.contains("execute-plan"));
+        Assert.assertTrue(responseString.contains("sa-rest"));
+        System.out.println("response=" + responseString);
+    }
+    @Step("When User sends SA-REST Get Api Request without authentication parameters")
+    public void verifyPlanWithoutAuthenatication() throws IOException, SAXException {
+        Response response = apiRequests.invalidSaAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text,560).when().get("serverautomation/plan/master/{planID}");
+        Integer statusCode = response.statusCode();
+
+        System.out.println("##########################" +statusCode);
+        Assert.assertEquals(401, statusCode.intValue());
+    }
+    @Step("When User sends SA-REST Plan Action Api Request without authentication parameters")
+    public void verifyPlanActionWithoutAuthenatication() throws IOException, SAXException {
+        Response response = apiRequests.invalidSaAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text,560).when().get("serverautomation/planaction/{planID}");
+        Integer statusCode = response.statusCode();
+
+        System.out.println("##########################" +statusCode);
+        Assert.assertEquals(401, statusCode.intValue());
+    }
+    @Step("And checks whether sa rest GET api works for it")
+    public void verifyPlanAction() throws IOException, SAXException {
+
+        String PlanID = "560";
+        Response response = apiRequests.invalidSaAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text,PlanID).when().get("serverautomation/planaction/{planID}");
+        System.out.println("*****************************");
+        System.out.println("*****************************"+response.getStatusCode());
+        logger.info("Generated response is : \n" + response);
+    }
+    @Step("Then in response user should get http 401 status code")
+    public void verifyPlanActionWithoutAuthe() throws IOException, SAXException {
+        Response response = apiRequests.invalidSaAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text,560).when().get("serverautomation/planaction/{planID}");
+        Integer statusCode = response.statusCode();
+
+        System.out.println("##########################" +statusCode);
+        Assert.assertEquals(401, statusCode.intValue());
+    }
+
+     @Step("And user should validate the error message in response body")
+    public void PlanActionXmlValidations() {
+        XMLParser xmlParser = new XMLParser();
+        Response response = apiRequests.invalidSaAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(CreatePlanConsts.PLAN_ID.text,560).when().get("serverautomation/planaction/{planID}");;
+        String responseString = response.asString();
+        System.out.println("response=" + responseString);
+
+    }
+
+
+
+
+
+
+
+
+
+
 }

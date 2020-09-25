@@ -30,7 +30,9 @@
 
     "saRestApi" : {
       "planExecutionTemplate" : "serverautomation/plan/{siteType}/{siteName}/{planID}",
-      "executePlan" : "serverautomation/plan/{siteType}/{siteName}/{planID}"
+      "executePlan" : "serverautomation/plan/{siteType}/{siteName}/{planID}",
+      "executeMasterSitePlan":"serverautomation/plan/master/{planID}",
+      "executeActionPlan":"serverautomation/planaction/{planID}"
     }
   }
 }
