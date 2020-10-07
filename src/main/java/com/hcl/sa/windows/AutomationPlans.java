@@ -188,6 +188,16 @@ public class AutomationPlans implements AutomationPlanLocators {
         return response;
     }
 
+    public Response getSaRestPlanXml(String planID) {
+        HashMap<String, String> params = new HashMap<>();
+        String uri = jsonParser.getUriToFetchPlanXml(saRestConsoleApiObject);
+        logger.info(uri);
+        params.put(CreatePlanConsts.PLAN_ID.text, planID);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(params);
+        Response response = apiRequests.GET(requestSpecification, "serverautomation/plan/master/{planID}");
+        return response;
+    }
+
     public Response getPlanXml(RequestSpecification requestSpecification) {
         String uri = jsonParser.getUriToFetchPlanXml(saRestConsoleApiObject);
         System.out.println("Uri="+uri);
@@ -202,12 +212,12 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     public void executePlan(String planID, HashMap<String, String> fixletDetails) throws Exception {
         HashMap<String, String> params = new HashMap<>();
-        Response response = getPlanXml(planID);
+        Response response = getSaRestPlanXml(planID);
         logger.debug("Initiated the execute plan" + response.toString());
         String actionBody = modifyPlanDefXmlTemplate(fixletDetails, response);
         String uri = jsonParser.getUriToTakeActionOnPlan(planConsoleApiObject);
         params.put(CreatePlanConsts.PLAN_ID.text, planID);
-        RequestSpecification requestSpecification = apiRequests.setWasLibertyURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
                 .and().pathParam(CreatePlanConsts.PLAN_ID.text, params.get(CreatePlanConsts.PLAN_ID.text)).and().body(actionBody);
         Response postResponse = apiRequests.POST(requestSpecification, uri);
         String planActionID = postResponse.getBody().asString();
