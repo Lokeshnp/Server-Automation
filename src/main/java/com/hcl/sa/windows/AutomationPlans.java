@@ -20,10 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -40,7 +37,6 @@ public class AutomationPlans implements AutomationPlanLocators {
     ApiRequests apiRequests = new ApiRequests();
     JsonParser jsonParser = new JsonParser();
     XMLParser xmlParser = new XMLParser();
-    JsonObject planConsoleApiObject = jsonParser.getPlanConsoleApiObject();
     public JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
     CommonFunctions commonFunctions = new CommonFunctions();
@@ -179,43 +175,40 @@ public class AutomationPlans implements AutomationPlanLocators {
         return planID;
     }
 
-    public Response getPlanXml(String planID) {
-        String uri = jsonParser.getUriToFetchPlanXml(planConsoleApiObject);
-        HashMap<String, String> params = new HashMap<>();
-        params.put(CreatePlanConsts.PLAN_ID.text, planID);
-        RequestSpecification requestSpecification = apiRequests.setWasLibertyURIAndBasicAuthentication().and().pathParams(params);
-        Response response = apiRequests.GET(requestSpecification, uri);
-        return response;
-    }
-
-    public Response getSaRestPlanXml(String planID) {
-        HashMap<String, String> params = new HashMap<>();
-        String uri = jsonParser.getUriToFetchPlanXml(saRestConsoleApiObject);
-        logger.info(uri);
-        params.put(CreatePlanConsts.PLAN_ID.text, planID);
-        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(params);
-        Response response = apiRequests.GET(requestSpecification, "serverautomation/plan/master/{planID}");
-        return response;
-    }
 
     public Response getPlanXml(RequestSpecification requestSpecification) {
         String uri = jsonParser.getUriToFetchPlanXml(saRestConsoleApiObject);
-        System.out.println("Uri="+uri);
+        logger.info("Server automation site plan execution URL "+uri);
         Response response = apiRequests.GET(requestSpecification, uri);
         return response;
     }
 
-    public Response getPlanXml(RequestSpecification requestSpecification,String uri) {
+    public Response getPlanXml(String planID) {
+        String uri = jsonParser.getUriToFetchSaRestMasterPlanXml(saRestConsoleApiObject);
+        HashMap<String, String> params = new HashMap<>();
+        params.put(CreatePlanConsts.PLAN_ID.text, planID);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(params);
+        Response response = apiRequests.GET(requestSpecification, uri);
+        return response;
+    }
+
+    public Response getPlanAction(String planActionID) {
+        String uri = jsonParser.getUriToFetchPlanAction(saRestConsoleApiObject);
+        int seconds = (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
+        winActions.hardWait(seconds);
+        HashMap<String, String> params = new HashMap<>();
+        params.put(CreatePlanConsts.PLAN_ACTION_ID.text, planActionID);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(params);
         Response response = apiRequests.GET(requestSpecification, uri);
         return response;
     }
 
     public void executePlan(String planID, HashMap<String, String> fixletDetails) throws Exception {
         HashMap<String, String> params = new HashMap<>();
-        Response response = getSaRestPlanXml(planID);
+        Response response = getPlanXml(planID);
         logger.debug("Initiated the execute plan" + response.toString());
         String actionBody = modifyPlanDefXmlTemplate(fixletDetails, response);
-        String uri = jsonParser.getUriToTakeActionOnPlan(planConsoleApiObject);
+        String uri = jsonParser.getUriToFetchSaRestMasterPlanXml(saRestConsoleApiObject);
         params.put(CreatePlanConsts.PLAN_ID.text, planID);
         RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
                 .and().pathParam(CreatePlanConsts.PLAN_ID.text, params.get(CreatePlanConsts.PLAN_ID.text)).and().body(actionBody);
@@ -244,7 +237,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         long startTime = System.currentTimeMillis();
         boolean waitUntillApplicableCompsDisp = true;
         do {
-            Response relevantMachines = consoleActions.getApplicableComputersApiResponse(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, fixletID));
+            Response relevantMachines = consoleActions.getApplicableComputersApiResponse(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.SA.text, fixletID));
             computerTagCount = xmlParser.getElementsByTagName(relevantMachines.asInputStream(), XMLConsts.COMPUTER_TAGNAME.text).getLength();
             waitUntillApplicableCompsDisp = (System.currentTimeMillis() - startTime) < commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
             if (!waitUntillApplicableCompsDisp) {
@@ -257,7 +250,7 @@ public class AutomationPlans implements AutomationPlanLocators {
 
     public List<String> getApplicableComputersID(String fixletID) throws IOException, SAXException {
         List<String> compIDsList = new ArrayList<String>();
-        Response response = consoleActions.getApplicableComputersApiResponse(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.POOJA.text, fixletID));
+        Response response = consoleActions.getApplicableComputersApiResponse(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.SA.text, fixletID));
         logger.debug("Relevant Machines = " + response.asString());
         List<String> computersList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), consoleActions.COMP_ATTR_XPATH);
         computersList.forEach(computer -> {
@@ -338,5 +331,127 @@ public class AutomationPlans implements AutomationPlanLocators {
         SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
         logger.info("Plan Created");
         return planID;
+    }
+
+    public String modifyPlanDefXmlTemp(HashMap<String, String> fixletDetails, Response response) throws Exception {
+        XMLParser xmlParser = new XMLParser();
+        Document doc = xmlParser.buildDocument(response.asInputStream());
+        NodeList nodes = doc.getElementsByTagName(XMLConsts.STEP.text);
+        Assert.assertEquals("step and fixlet details length is different", fixletDetails.size(), nodes.getLength());
+        int count = 0;
+        for (Map.Entry<String, String> map : fixletDetails.entrySet()) {
+            Node node = nodes.item(count);
+            Element element = (Element) node;
+            String fixletID = map.getValue();
+            Integer computerTagCount = waitUntilApplicableCompsVisible(fixletID);
+            String computerName = null;
+            if (computerTagCount == 1) {
+                //TODO : Later try to use dynamic method from ConsoleActions
+                computerName = getApplicableComputerName(fixletID);
+            }
+            Node parameterSet = doc.getElementsByTagName(XMLConsts.PARAMETER_SET.text).item(0);
+
+            NodeList list = parameterSet.getChildNodes();
+            for (int i = 0; i < list.getLength(); i++) {
+                Node childnode = list.item(i);
+                if ("parameter".equals(childnode.getNodeName())) {
+                    NamedNodeMap attr = childnode.getAttributes();
+                    Node nodeAttr = attr.getNamedItem("name");
+                    String name=nodeAttr.getNodeValue();
+                    if(name.equalsIgnoreCase("firstName")){
+                        childnode.setTextContent(CreatePlanConsts.FIRST_NAME.text);}
+                    if(name.equalsIgnoreCase("lastName")){
+                        childnode.setTextContent(CreatePlanConsts.LAST_NAME.text);
+                    }
+
+                }
+                if ("secure-parameter".equals(childnode.getNodeName())) {
+                    childnode.setTextContent(CreatePlanConsts.PASSWORD.text);   }
+
+            }
+
+            Element targetElement = doc.createElement(XMLConsts.TARGET_SET.text);
+            Element computer = doc.createElement(XMLConsts.COMPUTER.text);
+            computer.setAttribute(XMLConsts.NAME.text, computerName);
+            targetElement.appendChild(computer);
+            element.appendChild(targetElement);
+            count++;
+        }
+        String actionBody = xmlParser.convertDocToString(doc);
+        return actionBody;
+    }
+
+    public void executePlanSAREST(String planID, HashMap<String, String> fixletDetails) throws Exception {
+        HashMap<String, String> params = new HashMap<>();
+        Response response = getPlanXml(planID);
+        logger.debug("Initiated the execute plan" + response.toString());
+        String actionBody= modifyPlanDefXmlTemp(fixletDetails, response);
+        String uri = jsonParser.getUriToFetchSaRestMasterPlanXml(saRestConsoleApiObject);
+        params.put(CreatePlanConsts.PLAN_ID.text, planID);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
+                .and().pathParam(CreatePlanConsts.PLAN_ID.text, params.get(CreatePlanConsts.PLAN_ID.text)).and().body(actionBody);
+        Response postResponse = apiRequests.POST(requestSpecification, uri);
+        String actionID = postResponse.getBody().asString();
+        int statusCode = postResponse.getStatusCode();
+        SuperClass.specStore.put(CreatePlanConsts.STATUS_CODE, statusCode);
+        SuperClass.specStore.put(ConsoleConsts.ACTION_ID, actionID);
+        logger.debug("Response after initiating the action: \n" + actionID);
+    }
+
+    public String waitTillActionIsStoppedForSAREST(String actionID) throws Exception {
+        String status;
+        Boolean isStopped;
+        Node statusSet;
+        logger.info("Waiting till the plan action state becomes stopped");
+        do {
+            Response response = consoleActions.getActionStatusForSAREST(actionID);
+            XMLParser xmlParser = new XMLParser();
+            Document doc = xmlParser.buildDocument(response.asInputStream());
+            statusSet = doc.getElementsByTagName(XMLConsts.STATUS_SET.text).item(0);
+            NamedNodeMap attr = statusSet.getAttributes();
+            Node state= attr.getNamedItem("state");
+            status=state.getNodeValue();
+            isStopped = (status.contains("Stopped"));
+            if (status.contains("Stopped")) {
+                NodeList list = statusSet.getChildNodes();
+                logger.info("list size is "+list.getLength());
+                if (list.getLength()==0) {
+                    logger.info("stepId is not created");
+                    throw new Exception("stepId is not created");
+                } else {
+                    logger.info("step id exists");
+                }
+            }
+        }while (!(isStopped));
+        logger.debug("Action Status = " + status);
+        return status;
+    }
+
+    public void verifyDefaultSettings(){
+        List<WebElement> computerList = winActions.findElementsByXpath("//*[normalize-space(@Name)='Computers']/following-sibling::*");
+        Assert.assertEquals(ConsoleConsts.ROOT_SERVER.text,computerList.get(0).getAttribute(WinAppConsts.ATTR_NAME.value).trim());
+    }
+
+    public void clickTakeAction(String planName){
+        searchPlan(planName);
+        winActions.waitForListVisibility(winActions.findElementsByName(planName),10);
+        winActions.findElementByName(planName).click();
+        winActions.findElementByName(take_action_using_name).click();
+        logger.info("User clicked on take action button");
+    }
+
+    public void addCompToSelectedTarget(String compName){
+        WebElement searchBtn = winActions.findElementByAccessibilityId(default_settings_search_btn_auto_id);
+        winActions.waitForElementVisibilityAndClick(searchBtn,10);
+        winActions.findElementByXpath("//Table//DataItem[contains(@Name,'"+compName+"')]").click();
+        winActions.findElementByName(default_settings_move_btn_name).click();
+        winActions.findElementByName(default_settings_OK_btn_name).click();
+        logger.info("Selected computer= "+compName+" is added to select target window");
+    }
+
+    public void clickDefaultSettings(){
+        WebElement ele = winActions.findElementByXpath(default_settings_btn_using_name);
+        winActions.waitForElementVisibility(ele,10);
+        ele.click();
     }
 }

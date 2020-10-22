@@ -2,15 +2,19 @@ package com.hcl.sa.utils.api;
 
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.CreatePlanConsts;
+import com.hcl.sa.constants.TimeOutConsts;
 import com.hcl.sa.utils.bigfix.Credentials;
 import io.restassured.RestAssured;
+
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.response.ResponseOptions;
 import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.ResponseSpecification;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
 
 public class ApiRequests {
 
@@ -22,15 +26,11 @@ public class ApiRequests {
         return bigfixCredentials;
     }
 
-    public RequestSpecification setWasLibertyURIAndBasicAuthentication() {
-        RestAssured.baseURI = CreatePlanConsts.WAS_LIBERTY_SERVER_URI.text;
-        RestAssured.useRelaxedHTTPSValidation();
-        Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());
-        RequestSpecification bigfixCredentials = given().auth().preemptive().basic(consoleCred.getUsername(), consoleCred.getPassword());
-        return bigfixCredentials;
-    }
-
     public RequestSpecification setSaRestURIAndBasicAuthentication() {
+        RestAssured.config = RestAssuredConfig.config().httpClient(HttpClientConfig.httpClientConfig().setParam("http.connection.timeout",60000).
+                setParam(CreatePlanConsts.SOCKET_TIME_OUT.text, TimeOutConsts.WAIT_60_SECONDS.seconds).
+                setParam(CreatePlanConsts.CONNECTION_TIME_OUT.text,TimeOutConsts.WAIT_60_SECONDS.seconds)).
+                sslConfig(SSLConfig.sslConfig().allowAllHostnames());
         RestAssured.baseURI = CreatePlanConsts.SA_REST_SERVER_URI.text;
         RestAssured.useRelaxedHTTPSValidation();
         Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());
@@ -38,11 +38,9 @@ public class ApiRequests {
         return bigfixCredentials;
     }
 
-
-    public RequestSpecification SaRestURIAndBasicAuthentication() {
+    public RequestSpecification setSaRestURIAndInvalidAuthentication() {
         RestAssured.baseURI = CreatePlanConsts.SA_REST_SERVER_URI.text;
         RestAssured.useRelaxedHTTPSValidation();
-        Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());
         RequestSpecification bigfixCredentials = given().auth().preemptive().basic("bigfix","password");
         return bigfixCredentials;
     }
@@ -105,10 +103,9 @@ public class ApiRequests {
     }
 
     public Response GET(RequestSpecification reqSpecs, String uri) {
-        Response response = checkForStatusCode(reqSpecs.when().get(uri));
+         Response response = checkForStatusCode(reqSpecs.when().get(uri));
         return response;
     }
-
 
     public RequestSpecification invalidSaAuthentication() {
         RestAssured.baseURI = CreatePlanConsts.SA_REST_SERVER_URI.text;;

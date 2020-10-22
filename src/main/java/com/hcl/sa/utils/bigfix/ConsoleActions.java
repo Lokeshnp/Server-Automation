@@ -10,6 +10,8 @@ import com.hcl.sa.utils.api.ApiRequests;
 import com.hcl.sa.utils.api.Payload;
 import com.hcl.sa.utils.parser.JsonParser;
 import com.hcl.sa.utils.parser.XMLParser;
+import com.hcl.sa.utils.winappdriver.WinAppDriverActions;
+import io.appium.java_client.windows.WindowsDriver;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -36,8 +38,11 @@ public class ConsoleActions implements XmlLocators {
     XMLParser xmlParser = new XMLParser();
     JsonParser jsonParser = new JsonParser();
     Payload payload = new Payload();
+    WindowsDriver winDriver = SuperClass.getInstance().getWinAppDriver(ConsoleConsts.CONSOLE_EXE_PATH.text);
+    WinAppDriverActions winActions = new WinAppDriverActions(winDriver);
     String siteName = jsonParser.getSiteNameObject().get(ConsoleConsts.SERVER_AUTOMATION.text).getAsString();
     JsonObject consoleApiObject = jsonParser.getConsoleApiObject();
+    JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
 
     public Response getApplicableComputersApiResponse(HashMap<String, String> params) {
         String uri = jsonParser.getUriToFetchRelevantComputers(consoleApiObject);
@@ -320,6 +325,17 @@ public class ConsoleActions implements XmlLocators {
         Response response = apiRequests.GET(requestSpecification, uri);
         planList = xmlParser.getElementOfXmlByXpath(response.asInputStream(), PLAN_NAME_XPATH);
         return planList;
+    }
+
+    public Response getActionStatusForSAREST(String actionID) {
+        String uri = jsonParser.getUriToFetchPlanAction(saRestConsoleApiObject);
+        int seconds = (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
+        winActions.hardWait(seconds);
+        HashMap<String, String> params = new HashMap<>();
+        params.put(CreatePlanConsts.PLAN_ACTION_ID.text, actionID);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(params);
+        Response response = apiRequests.GET(requestSpecification, uri);
+        return response;
     }
 
 }

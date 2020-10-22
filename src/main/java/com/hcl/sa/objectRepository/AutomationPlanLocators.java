@@ -21,4 +21,9 @@ public interface AutomationPlanLocators {
     String summary_using_xpath = "//Text[@Name='Summary']/parent::*/following-sibling::*";
     //Sequence order is not changing so 101 is passed in Name locator
     String select_check_box_using_xpath = "//*[@Name='101']/preceding-sibling::*/CheckBox";
+    String take_action_using_name = "Take Action";
+    String default_settings_move_btn_name = ">";
+    String default_settings_OK_btn_name = "OK";
+    String default_settings_btn_using_name = "//*[normalize-space(@Name)='Default Settings']";
+    String default_settings_search_btn_auto_id = "filterSearchButton";
 }

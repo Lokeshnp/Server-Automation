@@ -20,19 +20,14 @@
     "siteName": {
       "serverAutomation": "Server Automation",
       "Abhinav":"Abhinav",
-      "Pooja":"Pooja",
+      "SA": "SA",
       "master": "master"
-    },
-    "wasLibertyApi" : {
-      "planExecutionTemplate" : "serverautomation/plan/master/{planID}",
-      "executePlan" : "serverautomation/plan/master/{planID}"
     },
 
     "saRestApi" : {
       "planExecutionTemplate" : "serverautomation/plan/{siteType}/{siteName}/{planID}",
-      "executePlan" : "serverautomation/plan/{siteType}/{siteName}/{planID}",
       "executeMasterSitePlan":"serverautomation/plan/master/{planID}",
-      "executeActionPlan":"serverautomation/planaction/{planID}"
+      "executePlanAction":"serverautomation/planaction/{planActionID}"
     }
   }
 }
