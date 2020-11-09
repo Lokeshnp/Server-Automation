@@ -10,7 +10,6 @@
 
 Verify SA-REST Get API works for existing external site automation plan
 ---------------------------------------------------------------------------------------
-
 tags: external
 * When User sends SA-REST Get Api Request for the existing external site automation plan
 * And response body as plan defintion xml template of existing external site
@@ -131,12 +130,12 @@ tags: secure
 Verify SA-REST Plan Action API works for existing plan action id
 -----------------------------------------------------------------
 tags: action
-  * Create automation plan with multiple fixlet on following OS
+* Create automation plan with multiple fixlet on following OS
   |OS Name |
   |--------|
   |windows |
   |Linux   |
-  * Then execute automation plan with multiple fixlet on following OS
+* Then execute automation plan with multiple fixlet on following OS
    |OS Name |
    |--------|
    |windows |
@@ -148,7 +147,6 @@ tags: action
 Verify SA-REST Plan Action API without authentication parameters
 -----------------------------------------------------------------
 tags:
-
 * When User sends SA-REST Plan Action Api Request without authentication parameters
 * And gets response as http 401 status code for without authentication
 * And user should validate the error message in response body of without authentication

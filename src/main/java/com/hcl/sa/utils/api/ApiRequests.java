@@ -3,6 +3,7 @@ package com.hcl.sa.utils.api;
 import com.hcl.sa.constants.ConsoleConsts;
 import com.hcl.sa.constants.CreatePlanConsts;
 import com.hcl.sa.constants.TimeOutConsts;
+import com.hcl.sa.utils.bigfix.CommonFunctions;
 import com.hcl.sa.utils.bigfix.Credentials;
 import io.restassured.RestAssured;
 
@@ -14,10 +15,9 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 
 public class ApiRequests {
-
+    CommonFunctions commonFunctions = new CommonFunctions();
     public RequestSpecification setBaseURIAndBasicAuthentication() {
         RestAssured.baseURI = ConsoleConsts.BIGFIX_SERVER_URI.text;
         RestAssured.useRelaxedHTTPSValidation();
@@ -27,10 +27,7 @@ public class ApiRequests {
     }
 
     public RequestSpecification setSaRestURIAndBasicAuthentication() {
-        RestAssured.config = RestAssuredConfig.config().httpClient(HttpClientConfig.httpClientConfig().setParam("http.connection.timeout",60000).
-                setParam(CreatePlanConsts.SOCKET_TIME_OUT.text, TimeOutConsts.WAIT_60_SECONDS.seconds).
-                setParam(CreatePlanConsts.CONNECTION_TIME_OUT.text,TimeOutConsts.WAIT_60_SECONDS.seconds)).
-                sslConfig(SSLConfig.sslConfig().allowAllHostnames());
+        RestAssured.config = RestAssuredConfig.config().httpClient(HttpClientConfig.httpClientConfig().setParam("http.connection.timeout", (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds)).setParam(CreatePlanConsts.SOCKET_TIME_OUT.text, (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds)).setParam(CreatePlanConsts.CONNECTION_TIME_OUT.text, (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds))).sslConfig(SSLConfig.sslConfig().allowAllHostnames());
         RestAssured.baseURI = CreatePlanConsts.SA_REST_SERVER_URI.text;
         RestAssured.useRelaxedHTTPSValidation();
         Credentials consoleCred = Credentials.valueOf(Credentials.CONSOLE.name());

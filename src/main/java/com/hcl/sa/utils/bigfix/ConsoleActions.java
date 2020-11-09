@@ -327,15 +327,12 @@ public class ConsoleActions implements XmlLocators {
         return planList;
     }
 
-    public Response getActionStatusForSAREST(String actionID) {
+    public Response getStepActionStatus(String actionID) {
         String uri = jsonParser.getUriToFetchPlanAction(saRestConsoleApiObject);
         int seconds = (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
         winActions.hardWait(seconds);
-        HashMap<String, String> params = new HashMap<>();
-        params.put(CreatePlanConsts.PLAN_ACTION_ID.text, actionID);
-        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(params);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(CreatePlanConsts.PLAN_ACTION_ID.text, actionID);
         Response response = apiRequests.GET(requestSpecification, uri);
         return response;
     }
-
 }

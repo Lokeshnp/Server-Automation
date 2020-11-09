@@ -192,17 +192,6 @@ public class AutomationPlans implements AutomationPlanLocators {
         return response;
     }
 
-    public Response getPlanAction(String planActionID) {
-        String uri = jsonParser.getUriToFetchPlanAction(saRestConsoleApiObject);
-        int seconds = (int)commonFunctions.convertToMilliSeconds(TimeOutConsts.WAIT_60_SECOND.seconds);
-        winActions.hardWait(seconds);
-        HashMap<String, String> params = new HashMap<>();
-        params.put(CreatePlanConsts.PLAN_ACTION_ID.text, planActionID);
-        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().and().pathParams(params);
-        Response response = apiRequests.GET(requestSpecification, uri);
-        return response;
-    }
-
     public void executePlan(String planID, HashMap<String, String> fixletDetails) throws Exception {
         HashMap<String, String> params = new HashMap<>();
         Response response = getPlanXml(planID);
@@ -333,7 +322,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         return planID;
     }
 
-    public String modifyPlanDefXmlTemp(HashMap<String, String> fixletDetails, Response response) throws Exception {
+    public String modifySecureParameterPlanDefXmlTemp(HashMap<String, String> fixletDetails, Response response) throws Exception {
         XMLParser xmlParser = new XMLParser();
         Document doc = xmlParser.buildDocument(response.asInputStream());
         NodeList nodes = doc.getElementsByTagName(XMLConsts.STEP.text);
@@ -350,20 +339,18 @@ public class AutomationPlans implements AutomationPlanLocators {
                 computerName = getApplicableComputerName(fixletID);
             }
             Node parameterSet = doc.getElementsByTagName(XMLConsts.PARAMETER_SET.text).item(0);
-
             NodeList list = parameterSet.getChildNodes();
             for (int i = 0; i < list.getLength(); i++) {
                 Node childnode = list.item(i);
-                if ("parameter".equals(childnode.getNodeName())) {
+                if (CreatePlanConsts.PARAMETER.text.equals(childnode.getNodeName())) {
                     NamedNodeMap attr = childnode.getAttributes();
-                    Node nodeAttr = attr.getNamedItem("name");
+                    Node nodeAttr = attr.getNamedItem(CreatePlanConsts.NAME.text);
                     String name=nodeAttr.getNodeValue();
-                    if(name.equalsIgnoreCase("firstName")){
+                    if(name.equalsIgnoreCase(CreatePlanConsts.FIRSTNAME.text)){
                         childnode.setTextContent(CreatePlanConsts.FIRST_NAME.text);}
-                    if(name.equalsIgnoreCase("lastName")){
+                    if(name.equalsIgnoreCase(CreatePlanConsts.LASTNAME.text)){
                         childnode.setTextContent(CreatePlanConsts.LAST_NAME.text);
                     }
-
                 }
                 if ("secure-parameter".equals(childnode.getNodeName())) {
                     childnode.setTextContent(CreatePlanConsts.PASSWORD.text);   }
@@ -381,11 +368,11 @@ public class AutomationPlans implements AutomationPlanLocators {
         return actionBody;
     }
 
-    public void executePlanSAREST(String planID, HashMap<String, String> fixletDetails) throws Exception {
+    public void exectueSaRestPlan(String planID, HashMap<String, String> fixletDetails) throws Exception {
         HashMap<String, String> params = new HashMap<>();
         Response response = getPlanXml(planID);
         logger.debug("Initiated the execute plan" + response.toString());
-        String actionBody= modifyPlanDefXmlTemp(fixletDetails, response);
+        String actionBody= modifySecureParameterPlanDefXmlTemp(fixletDetails, response);
         String uri = jsonParser.getUriToFetchSaRestMasterPlanXml(saRestConsoleApiObject);
         params.put(CreatePlanConsts.PLAN_ID.text, planID);
         RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
@@ -398,19 +385,17 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.debug("Response after initiating the action: \n" + actionID);
     }
 
-    public String waitTillActionIsStoppedForSAREST(String actionID) throws Exception {
+    public String waitTillActionIsStoppedForSaRestPlan(String actionID) throws Exception {
+        XMLParser xmlParser = new XMLParser();
         String status;
         Boolean isStopped;
         Node statusSet;
         logger.info("Waiting till the plan action state becomes stopped");
         do {
-            Response response = consoleActions.getActionStatusForSAREST(actionID);
-            XMLParser xmlParser = new XMLParser();
+            Response response = consoleActions.getStepActionStatus(actionID);
             Document doc = xmlParser.buildDocument(response.asInputStream());
             statusSet = doc.getElementsByTagName(XMLConsts.STATUS_SET.text).item(0);
-            NamedNodeMap attr = statusSet.getAttributes();
-            Node state= attr.getNamedItem("state");
-            status=state.getNodeValue();
+            status=statusSet.getNodeValue();
             isStopped = (status.contains("Stopped"));
             if (status.contains("Stopped")) {
                 NodeList list = statusSet.getChildNodes();

@@ -227,7 +227,8 @@ public class Create_Plan_Steps {
 
     @Step("Then add a fixlet to the plan")
     public void addFixletToPlan(){
-        automationPlans.addStepToPlan("9","Uninstall Automation Plan Engine (RHEL)");
+        automationPlans.addStepToPlan(CreatePlanConsts.FIX_UNINSTALL_PLAN_ENGINE_ID.text, CreatePlanConsts.FIX_UNINSTALL_PLAN_ENGINE.text);
+        logger.info("Adding step to the plan");
     }
 
     @Step("Click on default settings icon")
