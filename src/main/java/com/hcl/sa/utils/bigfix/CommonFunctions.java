@@ -87,6 +87,15 @@ public class CommonFunctions {
         return commonPara;
     }
 
+    public HashMap<String, String> saRestCommonParam(String siteType, String siteName, String planID) {
+        HashMap<String, String> commonPara = new HashMap<>();
+        commonPara.put(ConsoleConsts.SITE_TYPE.text, siteType);
+        commonPara.put(ConsoleConsts.SITE_NAME.text, siteName);
+        commonPara.put(CreatePlanConsts.PLAN_ID.text, planID);
+        logger.debug("Common Params=" + commonPara);
+        return commonPara;
+    }
+
     public StringBuilder readTextFile(String textFilepath) throws IOException {
         File file = new File(textFilepath);
         logger.debug("Text File Path = " + textFilepath);

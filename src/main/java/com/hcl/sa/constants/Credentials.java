@@ -14,6 +14,7 @@ public enum Credentials {
         }
     };
 
+
     public abstract  String getPassword();
     public abstract  String getUsername();
 }

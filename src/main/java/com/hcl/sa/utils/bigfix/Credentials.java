@@ -31,7 +31,25 @@ public enum Credentials {
         public String getServerIP() {
             return System.getenv("vsphere_server_IP");
         }
+    },
+    OPERATOR{
+        @Override
+        public String getPassword() {
+            return System.getenv("operator_password");
+        }
+
+        @Override
+        public String getUsername() {
+            return  System.getenv("operator_username");
+        }
+
+        @Override
+        public String getServerIP() {
+            return  System.getenv("bigfix_server_ip");
+        }
     };
+
+
     public abstract  String getPassword();
     public abstract  String getUsername();
     public abstract String getServerIP();

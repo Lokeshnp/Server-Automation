@@ -1,0 +1,21 @@
+<BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
+    <Operator Resource="https://localhost:52311/api/operator/SAOperator1">
+        <Name>SAOperator1</Name>
+        <Password>SAOperator@123</Password>
+        <MasterOperator>false</MasterOperator>
+        <CustomContent>true</CustomContent>
+        <ShowOtherActions>true</ShowOtherActions>
+        <CanCreateActions>true</CanCreateActions>
+        <PostActionBehaviorPrivilege>AllowRestartAndShutdown</PostActionBehaviorPrivilege>
+        <ActionScriptCommandsPrivilege>AllowRestartAndShutdown</ActionScriptCommandsPrivilege>
+        <CanLock>true</CanLock>
+        <CanSendMultipleRefresh>true</CanSendMultipleRefresh>
+        <LoginPermission>Unrestricted</LoginPermission>
+        <UnmanagedAssetPrivilege>ShowAll</UnmanagedAssetPrivilege>
+        <InterfaceLogins>
+            <Console>true</Console>
+            <API>true</API>
+        </InterfaceLogins>
+        <ComputerAssignments Match="Any"><AllComputers/></ComputerAssignments>
+    </Operator>
+</BESAPI>

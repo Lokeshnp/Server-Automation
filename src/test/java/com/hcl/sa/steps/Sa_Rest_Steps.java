@@ -9,6 +9,7 @@ import com.hcl.sa.utils.bigfix.CommonFunctions;
 import com.hcl.sa.utils.bigfix.ConsoleActions;
 import com.hcl.sa.utils.bigfix.SuperClass;
 import com.hcl.sa.utils.parser.JsonParser;
+import com.hcl.sa.utils.parser.XMLParser;
 import com.hcl.sa.windows.AutomationPlans;
 import com.thoughtworks.gauge.Step;
 import com.thoughtworks.gauge.Table;
@@ -18,10 +19,13 @@ import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +37,7 @@ public class Sa_Rest_Steps {
     ApiRequests apiRequests = new ApiRequests();
     CommonFunctions commonFunctions = new CommonFunctions();
     JsonParser jsonParser = new JsonParser();
+    XMLParser xmlParser = new XMLParser();
     public JsonObject saRestConsoleApiObject = jsonParser.getSaRestPlanConsoleApiObject();
     Response response;
 
@@ -401,5 +406,11 @@ public class Sa_Rest_Steps {
         logger.debug("verify plan action status: \n" + actionStatus);
     }
 
-
+    @Step("Delete operator site")
+    public void deleteOperatorSite(){
+        String uri = jsonParser.getUriToDeleteOperator(jsonParser.getConsoleApiObject());
+        logger.info("uri:"+uri);
+        Response response = apiRequests.DELETE(ConsoleConsts.OPERATOR_NAME.text, ConsoleConsts.OPERATOR_VALUE.text, uri);
+        logger.debug("Response after deleting the plan = " + response.asString());
+    }
 }

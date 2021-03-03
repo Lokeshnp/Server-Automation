@@ -59,11 +59,30 @@ public class Create_Plan_Steps {
         logger.info("Created plan id : \n" + planID);
     }
 
+    @Step("Create operator automation plan with multiple fixlets on following OS <table>")
+    public void createPlanWithFixlets(Table table) throws Exception {
+        //TODO LATER THIS FILTER NAME WILL BE PASSED ON THE BASIS OF FIXLETS NAME UNDER TEST DATA
+        RequestSpecification requestSpecification = apiRequests.setBaseURIAndBasicAuthentication().
+                contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                pathParams(commonFunctions.commonParams(ConsoleConsts.CUSTOM.text, ConsoleConsts.SA.text));
+        HashMap<String, String> fixletDetails = consoleActions.importFixlet(CommonFunctions.getPath(ConsoleConsts.FIXLETS_FOLDER.text), requestSpecification);
+        String planID = automationPlans.createOperatorPlan(CreatePlanConsts.MULTIPLE_FIXLETS_PLAN.text, fixletDetails);
+        logger.info("Created plan id : \n" + planID);
+    }
+
     @Step("Then execute automation plan with multiple fixlets on following OS <table>")
     public void executePlanWithMultipleFixlets(Table table) throws Exception {
         String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
         HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
         automationPlans.executePlan(planID, fixletDetails);
+        logger.info("Executed plan id : \n" + planID);
+    }
+
+    @Step("Then execute operator automation plan with multiple fixlets on following OS <table>")
+    public void executeOperatorPlan(Table table) throws Exception {
+        String planID = SuperClass.specStore.get(CreatePlanConsts.PLAN_ID).toString();
+        HashMap<String, String> fixletDetails = (HashMap<String, String>) SuperClass.specStore.get(CreatePlanConsts.FIXLET_DETAILS);
+        automationPlans.executeOperatorPlan(planID, fixletDetails);
         logger.info("Executed plan id : \n" + planID);
     }
 

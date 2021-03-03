@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BESAPI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BESAPI.xsd">
+    <SitePermission Resource="https://localhost:52311/api/site/custom/SA/permission/operator/SAOperator1">
+        <Permission>Reader</Permission>
+        <Operator Resource="https://localhost:52311/api/operator/SA">SAOperator1</Operator>
+    </SitePermission>
+</BESAPI>

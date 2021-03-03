@@ -105,6 +105,15 @@ public class AutomationPlans implements AutomationPlanLocators {
         logger.info("Plan is saved");
     }
 
+    public void saveOperatorPlan() {
+        winActions.findElementByName(save_btn_using_name).click();
+        winActions.findElementByName(ok_btn_using_name).click();
+        winActions.findElementByName(no_btn_using_name).click();
+        winActions.findElementByName(cancel_btn_using_name).click();
+        winActions.findElementByName(ok_btn_using_name).click();
+        logger.info("Plan is saved");
+    }
+
     public void searchPlan(String planName) {
         WebElement searchPlanTextBox = winActions.findElementByAccessibilityId(search_plan_text_box_access_id);
         searchPlanTextBox.clear();
@@ -158,6 +167,22 @@ public class AutomationPlans implements AutomationPlanLocators {
         return planID;
     }
 
+    public String createOperatorPlan(String planName, HashMap<String, String> fixletDetails) {
+        logger.info("Plan creation in progress...");
+        clickCreateBtn();
+        enterPlanName(planName);
+        for (Map.Entry<String, String> fixletDetail : fixletDetails.entrySet()) {
+            clickAddStepBtn();
+            String fixletName = fixletDetail.getKey().split(".bes")[0].trim();
+            addStepToPlan(fixletDetail.getValue(), fixletName);
+        }
+        saveOperatorPlan();
+        String planID = getPlanID(planName);
+        SuperClass.specStore.put(CreatePlanConsts.PLAN_ID, planID);
+        logger.info("Plan Created");
+        return planID;
+    }
+
     public String createPlan(String planName, HashMap<String, String> fixletDetails, String siteName) {
         logger.info("Plan creation in progress...");
         clickCreateBtn();
@@ -192,6 +217,14 @@ public class AutomationPlans implements AutomationPlanLocators {
         return response;
     }
 
+    public Response getOperatorPlanXml(String planID) {
+        String uri = jsonParser.getUriToFetchSaRestOperatorPlanXml(saRestConsoleApiObject);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(commonFunctions.saRestCommonParam(ConsoleConsts.OPERATOR.text, ConsoleConsts.SAOPERATOR1.text, planID));
+        Response response = apiRequests.GET(requestSpecification, uri);
+        return response;
+    }
+
     public void executePlan(String planID, HashMap<String, String> fixletDetails) throws Exception {
         HashMap<String, String> params = new HashMap<>();
         Response response = getPlanXml(planID);
@@ -201,6 +234,19 @@ public class AutomationPlans implements AutomationPlanLocators {
         params.put(CreatePlanConsts.PLAN_ID.text, planID);
         RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY)
                 .and().pathParam(CreatePlanConsts.PLAN_ID.text, params.get(CreatePlanConsts.PLAN_ID.text)).and().body(actionBody);
+        Response postResponse = apiRequests.POST(requestSpecification, uri);
+        String planActionID = postResponse.getBody().asString();
+        SuperClass.specStore.put(CreatePlanConsts.PLAN_ACTION_ID, planActionID);
+        logger.debug("Response after initiating the action: \n" + planActionID);
+    }
+
+    public void executeOperatorPlan(String planID, HashMap<String, String> fixletDetails) throws Exception {
+        Response response = getOperatorPlanXml(planID);
+        logger.debug("Initiated the execute plan" + response.toString());
+        String actionBody = modifyPlanDefXmlTemplate(fixletDetails, response);
+        String uri = jsonParser.getUriToFetchSaRestOperatorPlanXml(saRestConsoleApiObject);
+        RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
+                and().pathParams(commonFunctions.saRestCommonParam(ConsoleConsts.OPERATOR.text, ConsoleConsts.SAOPERATOR1.text, planID)).and().body(actionBody);
         Response postResponse = apiRequests.POST(requestSpecification, uri);
         String planActionID = postResponse.getBody().asString();
         SuperClass.specStore.put(CreatePlanConsts.PLAN_ACTION_ID, planActionID);

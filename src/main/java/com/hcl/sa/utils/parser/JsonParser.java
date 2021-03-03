@@ -75,6 +75,11 @@ public class JsonParser {
         return jsonObject.get(CreatePlanConsts.PLAN_EXECUTION_MASTER_TEMPLATE.text).getAsString();
     }
 
+    public String getUriToFetchSaRestOperatorPlanXml(JsonObject jsonObject) {
+        return jsonObject.get(CreatePlanConsts.PLAN_EXECUTION_TEMPLATE.text).getAsString();
+    }
+
+
     public String getUriToFetchFixletList(JsonObject jsonObject) {
         return jsonObject.get(ConsoleConsts.FIXLET_LIST.text).getAsString();
     }
@@ -85,6 +90,20 @@ public class JsonParser {
 
     public String getUriToFetchPlanAction(JsonObject jsonObject) {
         return jsonObject.get(ConsoleConsts.PLAN_ACTION.text).getAsString();
+    }
+
+    public String getUriToCreateOperator(JsonObject jsonObject)
+    {
+        return jsonObject.get(ConsoleConsts.CREATE_OPERATOR.text).getAsString();
+    }
+
+    public String getUriToAssignSite(JsonObject jsonObject)
+    {
+        return jsonObject.get(ConsoleConsts.ASSIGN_SITE.text).getAsString();
+    }
+
+    public String getUriToDeleteOperator(JsonObject jsonObject) {
+        return jsonObject.get(ConsoleConsts.DELETE_OPERATOR.text).getAsString();
     }
 }
 

@@ -52,6 +52,11 @@ public class ApiRequests {
         return response;
     }
 
+    public Response PUT(RequestSpecification reqSpecs, String param, String paramValue, String body, String uri) {
+        Response response = checkForStatusCode(reqSpecs.and().pathParam(param, paramValue).and().body(body).when().put(uri));
+        return response;
+    }
+
     public Response POST(String uri) {
         Response response = checkForStatusCode(setBaseURIAndBasicAuthentication().contentType(ContentType.JSON).when().post(uri));
         return response;

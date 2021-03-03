@@ -8,6 +8,8 @@ public interface AutomationPlanLocators {
     String add_button_using_xpath = "//*[normalize-space(@Name)='Add']";
     String save_btn_using_name = "Save";
     String ok_btn_using_name = "OK";
+    String no_btn_using_name = "No";
+    String cancel_btn_using_name = "Cancel";
     String edit_field_using_xpath = "//*[@LocalizedControlType='edit']";
     String add_step_combobox = "//*[@LocalizedControlType='combo box']";
     String add_step_search_btn_using_xpath = "filterSearchButton";

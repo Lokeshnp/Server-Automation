@@ -22,15 +22,6 @@ tags: custom
 * Then in response user should get http 200 status code for custom site
 * And response body as plan defintion xml template of custom site
 
-//Verify SA-REST Get API works for operator site automation plan
-//---------------------------------------------------------------------------------------
-//*tags:
-//* User creates a operator site plan
-//* And checks whether sa rest GET api works for it
-//* And gets response as http 200 status code
-//* And response body as plan defintion xml template
-//* And user validate whether plan definition xml template is proper or not
-
 Verify SA-REST Get API works for master site automation plan having external site fixlets/tasks
 -------------------------------------------------------------------------------------------------
 tags:
@@ -165,7 +156,7 @@ tags:
 //* Then in response user should get http 200 status code
 //* And response body as help text document
 //* And user should validate the help text document
-
+//
 //Verify SA-REST.xsd API works for GET request
 //--------------------------------------------------------------------
 //*tags:
@@ -173,7 +164,7 @@ tags:
 //* Then in response user should get http 200 status code
 //* And response body as SA-REST.xsd document
 //* And user should validate the SA-REST.xsd document
-
+//
 //Uninstallation of SA-REST API Service
 //-------------------------------------------------------------------------------
 //*tags:

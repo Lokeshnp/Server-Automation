@@ -11,7 +11,10 @@
       "createBaselines":"api/baselines/{siteType}/{siteName}",
       "createTasks" : "api/tasks/{siteType}/{siteName}",
       "fixletList": "api/fixlets/{siteType}/{siteName}",
-      "deletePlan": "api/fixlet/master/{fixletID}"
+      "deletePlan": "api/fixlet/master/{fixletID}",
+      "createOperator": "api/operators",
+      "delete_operator": "api/operator/{operatorName}",
+      "assignSite": "api/site/{siteType}/{siteName}/permission/operator/{operatorName}"
     },
     "siteType": {
       "external": "external",
