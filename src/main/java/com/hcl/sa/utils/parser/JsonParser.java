@@ -99,7 +99,7 @@ public class JsonParser {
 
     public String getUriToAssignSite(JsonObject jsonObject)
     {
-        return jsonObject.get(ConsoleConsts.ASSIGN_SITE.text).getAsString();
+        return jsonObject.get(ConsoleConsts.SET_SITE_PERMISSION.text).getAsString();
     }
 
     public String getUriToDeleteOperator(JsonObject jsonObject) {

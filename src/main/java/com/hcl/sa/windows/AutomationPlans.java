@@ -220,7 +220,7 @@ public class AutomationPlans implements AutomationPlanLocators {
     public Response getOperatorPlanXml(String planID) {
         String uri = jsonParser.getUriToFetchSaRestOperatorPlanXml(saRestConsoleApiObject);
         RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
-                and().pathParams(commonFunctions.saRestCommonParam(ConsoleConsts.OPERATOR.text, ConsoleConsts.SAOPERATOR1.text, planID));
+                and().pathParams(commonFunctions.saRestCommonParam(ConsoleConsts.OPERATOR.text, ConsoleConsts.OPERATOR_USERNAME.text, planID));
         Response response = apiRequests.GET(requestSpecification, uri);
         return response;
     }
@@ -246,7 +246,7 @@ public class AutomationPlans implements AutomationPlanLocators {
         String actionBody = modifyPlanDefXmlTemplate(fixletDetails, response);
         String uri = jsonParser.getUriToFetchSaRestOperatorPlanXml(saRestConsoleApiObject);
         RequestSpecification requestSpecification = apiRequests.setSaRestURIAndBasicAuthentication().contentType(ContentType.JSON).and().accept(ContentType.ANY).and().
-                and().pathParams(commonFunctions.saRestCommonParam(ConsoleConsts.OPERATOR.text, ConsoleConsts.SAOPERATOR1.text, planID)).and().body(actionBody);
+                and().pathParams(commonFunctions.saRestCommonParam(ConsoleConsts.OPERATOR.text, ConsoleConsts.OPERATOR_USERNAME.text, planID)).and().body(actionBody);
         Response postResponse = apiRequests.POST(requestSpecification, uri);
         String planActionID = postResponse.getBody().asString();
         SuperClass.specStore.put(CreatePlanConsts.PLAN_ACTION_ID, planActionID);

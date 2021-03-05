@@ -1,13 +1,5 @@
 # User should be able to execute & view the plan status through SA-REST API's. In order to execute Plan engine & SA-REST API Service should be up & running
 
-//Installation of SA-REST API Service
-//-------------------------------------------------------------------------------
-//*tags:
-//* Given sa rest service is not installed on the target machine
-//* And User install it on the target machine
-//* Then sa rest folder should be created in default location
-//* And sa rest service should be up and running
-
 Verify SA-REST Get API works for existing external site automation plan
 ---------------------------------------------------------------------------------------
 tags: external
@@ -67,45 +59,6 @@ tags:
 * Then in response user should get http 401 status code for execute plan
 * And user should validate the error message in response body of execute plan
 
-//Execute Plan API by adding multiple target computer ids and names in target set tag of plan definition XML template
-//-------------------------------------------------------------------------------------------------------------------------
-//*tags:
-//* User creates master site plan
-//* And execute sa rest get api by adding the plan id in path parameters
-//* Verify API is returning HTTP 200 status code & Plan definition XML template
-//* And add multiple target computer names & ids in target-set tag of plan definition XML template
-//* Then execute the plan by adding xml template as request body in sa-rest post api
-//* Verify API is returning HTTP 200 status code & Plan Action id
-//* And wait untill it got executed sucessfully
-//* And verify the plan action id status
-//* And delete the Plan action id after status verification
-
-//Execute Plan API by adding multiple target computer names in target set tag of plan definition XML template
-//-------------------------------------------------------------------------------------------------------------
-//*tags:
-//* User creates master site plan
-//* And execute sa rest get api by adding the plan id in path parameters
-//* Verify API is returning HTTP 200 status code & Plan definition XML template
-//* And add multiple target computer names in target-set tag of plan definition XML template
-//* Then execute the plan by adding xml template as request body in sa-rest post api
-//* Verify API is returning HTTP 200 status code & Plan Action id
-//* And wait untill it got executed sucessfully
-//* And verify the plan action id status
-//* And delete the Plan action id after status verification
-
-//Execute Plan API by adding multiple target computer groups in target set tag of plan definition XML template
-//-------------------------------------------------------------------------------------------------------------
-//*tags:
-//* User creates master site plan
-//* And execute sa rest get api by adding the plan id in path parameters
-//* Verify API is returning HTTP 200 status code & Plan definition XML template
-//* And add multiple target computer groups in target-set tag of plan definition XML template
-//* Then execute the plan by adding xml template as request body in sa-rest post api
-//* Verify API is returning HTTP 200 status code & Plan Action id
-//* And wait untill it got executed sucessfully
-//* And verify the plan action id status
-//* And delete the Plan action id after status verification
-
 Execute Plan API by adding regular parameter, secure parameter in parameter-set tag of plan definition XML template
 ---------------------------------------------------------------------------------------------------------------------------
 tags: secure
@@ -148,27 +101,3 @@ tags:
 * When User sends SA-REST Plan Action Api Request with invalid authentication parameter
 * Then in response user should get http 401 status code for invalid authentication parameter
 * And user should validate the error message in response body of invalid authentication parameter
-
-//Verify SA-REST Help API works for GET request
-//--------------------------------------------------------------------
-//*tags:
-//* When User sends SA-REST Help Api with GET Request
-//* Then in response user should get http 200 status code
-//* And response body as help text document
-//* And user should validate the help text document
-//
-//Verify SA-REST.xsd API works for GET request
-//--------------------------------------------------------------------
-//*tags:
-//* When User sends SA-REST.xsd Api with GET Request
-//* Then in response user should get http 200 status code
-//* And response body as SA-REST.xsd document
-//* And user should validate the SA-REST.xsd document
-//
-//Uninstallation of SA-REST API Service
-//-------------------------------------------------------------------------------
-//*tags:
-//* Given sa rest service is installed on the target machine
-//* And User uninstall it on the target machine
-//* Then sa rest folder should be deleted in default location
-//* And sa rest service should be deleted

@@ -13,8 +13,8 @@
       "fixletList": "api/fixlets/{siteType}/{siteName}",
       "deletePlan": "api/fixlet/master/{fixletID}",
       "createOperator": "api/operators",
-      "delete_operator": "api/operator/{operatorName}",
-      "assignSite": "api/site/{siteType}/{siteName}/permission/operator/{operatorName}"
+      "deleteOperator": "api/operator/{operatorName}",
+      "sitePermission": "api/site/{siteType}/{siteName}/permission/operator/{operatorName}"
     },
     "siteType": {
       "external": "external",

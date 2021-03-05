@@ -13,6 +13,12 @@ import io.restassured.config.SSLConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
@@ -52,7 +58,9 @@ public class ApiRequests {
         return response;
     }
 
-    public Response PUT(RequestSpecification reqSpecs, String param, String paramValue, String body, String uri) {
+    public Response PUT(RequestSpecification reqSpecs, Map<String, String> params, String body, String uri) {
+        String param=params.get("operator name");
+        String paramValue=params.get("operator value");
         Response response = checkForStatusCode(reqSpecs.and().pathParam(param, paramValue).and().body(body).when().put(uri));
         return response;
     }
